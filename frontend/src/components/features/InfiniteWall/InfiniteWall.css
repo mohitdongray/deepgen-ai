@@ -1,0 +1,307 @@
+/**
+ * Infinite Horizontal Video Wall Styles
+ * 
+ * Scoped CSS for infinite scrolling video wall
+ * - Mixed aspect ratios: Cinematic (16:9) + Portrait (9:16)
+ * - Edge fade effect for smooth transitions
+ * - Opposite scroll directions
+ * - Wide immersive layout
+ */
+
+/* Main Infinite Wall Container with Edge Fade */
+.infinite-wall {
+  width: 100%;
+  background: #000;
+  overflow: hidden;
+  padding: 60px 0;
+  
+  /* Edge fade effect - darkness on left & right */
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  );
+}
+
+/* Override Parent Spacing - Real section spacing - increased gap */
+.infinite-scroll-section {
+  position: relative;
+
+  /* Break out of parent width */
+  width: 100vw;
+  left: 50%;
+  transform: translateX(-50%);
+
+  /* Stop flex gap control */
+  flex: none !important;
+  align-self: stretch !important;
+
+  /* Much larger spacing from other sections */
+  padding-top: 280px;
+  padding-bottom: 280px;
+}
+
+/* Protect From Global Section Rules */
+section.infinite-scroll-section {
+  margin: 120px 0 !important;
+}
+
+/* Wide Container - Immersive Layout */
+.infinite-wall-container {
+  width: 100%;
+  max-width: none;   /* IMPORTANT - Remove boxing */
+  padding: 0 5%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Reduced vertical gap between rows */
+}
+
+/* Section Title - Bold Gradient */
+.wall-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  text-align: center;
+  background: linear-gradient(135deg, #ffffff 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 40px;
+}
+
+/* Cinematic Two-Line Title Hierarchy */
+.section-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.sub-title {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, #ffffff 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+}
+
+.main-title {
+  font-size: 5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+/* Infinite Track - Scroll Height Support */
+.infinite-track {
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.infinite-track:last-child {
+  margin-bottom: 0;
+}
+
+/* Top Row Track - Cinematic (16:9) */
+.infinite-track:first-child {
+  min-height: 200px;
+}
+
+/* Bottom Row Track - Portrait (9:16) */
+.infinite-track:last-child {
+  min-height: 340px;
+}
+
+/* Horizontal Rows */
+.wall-row {
+  display: flex;
+  gap: 20px;
+  width: fit-content;
+}
+
+/* Top Row - Cinematic (16:9) - Right to Left Animation */
+.wall-row.row-cinematic {
+  animation: scrollRightToLeft 120s linear infinite;
+}
+
+/* Bottom Row - Portrait (9:16) - Left to Right Animation */
+.wall-row.row-portrait {
+  animation: scrollLeftToRight 150s linear infinite;
+}
+
+/* Cinematic Cards - Top Row (16:9) */
+.wall-card.cinematic-card {
+  border-radius: 24px;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 16 / 9;
+  flex-shrink: 0;
+  transition: transform 0.4s ease;
+  height: 260px;
+  width: auto;
+}
+
+.wall-card.cinematic-card:hover {
+  transform: scale(1.05);
+}
+
+/* Portrait Cards - Bottom Row (9:16) */
+.wall-card.portrait-card {
+  border-radius: 20px;
+  overflow: hidden;
+  background: #000;
+  aspect-ratio: 9 / 16;
+  flex-shrink: 0;
+  transition: transform 0.4s ease;
+  width: 280px;
+  height: 420px;
+}
+
+.wall-card.portrait-card:hover {
+  transform: scale(1.05);
+}
+
+/* Video Elements */
+.wall-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Ensure media fits properly in all cards */
+.wall-card img,
+.wall-card video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Desktop Sizes */
+@media (min-width: 769px) {
+  .wall-card.cinematic-card {
+    width: auto; /* Maintain aspect-ratio with height */
+  }
+  
+  .wall-card.portrait-card {
+    width: 280px; /* Match new portrait card size */
+  }
+  
+  .wall-row {
+    gap: 32px;
+  }
+}
+
+/* Tablet Sizes */
+@media (max-width: 768px) and (min-width: 481px) {
+  .wall-card.cinematic-card {
+    width: 260px;
+  }
+  
+  .wall-card.portrait-card {
+    width: 170px;
+  }
+  
+  /* Much slower animation on tablet */
+  .wall-row.row-cinematic {
+    animation-duration: 150s;
+  }
+  
+  .wall-row.row-portrait {
+    animation-duration: 180s;
+  }
+  
+  .wall-row {
+    gap: 24px;
+  }
+  
+  /* Responsive title scaling for tablet */
+  .main-title {
+    font-size: 4rem;
+  }
+
+  .sub-title {
+    font-size: 1.4rem;
+  }
+}
+
+/* Mobile Sizes */
+@media (max-width: 480px) {
+  .infinite-wall {
+    padding: 40px 0;
+  }
+  
+  .wall-card.cinematic-card {
+    width: 200px;
+  }
+  
+  .wall-card.portrait-card {
+    width: 140px;
+    height: 400px; /* Taller portrait cards on mobile */
+  }
+  
+  /* Much slower animation on mobile */
+  .wall-row.row-cinematic {
+    animation-duration: 180s;
+  }
+  
+  .wall-row.row-portrait {
+    animation-duration: 200s;
+  }
+  
+  .wall-row {
+    gap: 15px;
+  }
+  
+  /* Responsive title scaling */
+  .main-title {
+    font-size: 3rem;
+  }
+
+  .sub-title {
+    font-size: 1.5rem;
+  }
+  
+  .infinite-track {
+    margin-bottom: 20px;
+  }
+  
+  .infinite-track:first-child {
+    min-height: 160px;
+  }
+  
+  .infinite-track:last-child {
+    min-height: 280px;
+  }
+}
+
+/* Infinite Scroll Animations */
+@keyframes scrollRightToLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scrollLeftToRight {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}

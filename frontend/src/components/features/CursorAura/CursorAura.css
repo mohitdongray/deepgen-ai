@@ -1,0 +1,51 @@
+/**
+ * Cursor Particle Styles - Subtle AI SaaS Effect
+ * 
+ * Minimal, smooth cursor trail inspired by Sora AI
+ * Subtle colors, quick fade, gentle movement
+ */
+
+/* Particle Container */
+.cursor-aura-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/* Individual Particle Element */
+.cursor-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    rgba(139, 92, 246, 0.3) 0%,      /* Soft purple center */
+    rgba(99, 102, 241, 0.2) 40%,     /* Indigo middle */
+    rgba(255, 255, 255, 0.1) 100%    /* White edge */
+  );
+  filter: blur(1px);
+  will-change: transform, opacity;
+  transform-origin: center;
+  transition: none; /* Handled by JS for smooth animation */
+}
+
+/* Performance Optimization */
+@media (max-width: 768px) {
+  .cursor-aura-container {
+    display: none; /* Disable on mobile */
+  }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .cursor-particle {
+    filter: blur(0.5px);
+    background: rgba(139, 92, 246, 0.15);
+  }
+}

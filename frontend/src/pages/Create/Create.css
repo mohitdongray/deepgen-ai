@@ -1,0 +1,324 @@
+/**
+ * Create Page Styles - Premium AI SaaS Interface
+ * 
+ * Design principles:
+ * - Premium, futuristic but calm
+ * - Dynamic but not flashy  
+ * - Sharp and intentional
+ * - Comparable to Sora AI / Runway / OpenAI UI
+ */
+
+/* Create page - inherits solid black background */
+.create-page {
+  position: relative;
+  background: transparent; /* Changed: Let global black background show through */
+  min-height: 100vh;
+  padding: var(--spacing-xl);
+}
+
+.create-header {
+  text-align: center;
+  margin-bottom: var(--spacing-3xl);
+}
+
+.create-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: var(--spacing-md);
+  background: linear-gradient(135deg, #ffffff 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.create-subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Creation options with sharp edges */
+.create-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.create-option {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.create-option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.create-option:hover {
+  transform: translateY(-4px);
+  box-shadow: 
+    0 8px 24px rgba(99, 102, 241, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.create-option:hover::before {
+  opacity: 1;
+}
+
+.create-option--primary {
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.create-option--primary:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 
+    0 8px 24px rgba(99, 102, 241, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.create-option--secondary {
+  border-color: rgba(100, 116, 139, 0.2);
+}
+
+.create-option--secondary:hover {
+  border-color: rgba(100, 116, 139, 0.4);
+  box-shadow: 
+    0 8px 24px rgba(100, 116, 139, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.create-option--tertiary {
+  border-color: rgba(5, 150, 105, 0.2);
+}
+
+.create-option--tertiary:hover {
+  border-color: rgba(5, 150, 105, 0.4);
+  box-shadow: 
+    0 8px 24px rgba(5, 150, 105, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.create-option-icon {
+  width: 64px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.create-option--primary .create-option-icon {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.create-option--secondary .create-option-icon {
+  background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+}
+
+.create-option--tertiary .create-option-icon {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.create-option-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+}
+
+.create-option-description {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.create-option-arrow {
+  font-size: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: bold;
+  margin-top: auto;
+  transition: all 0.3s ease;
+}
+
+.create-option:hover .create-option-arrow {
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+/* Sticky AI Prompt Bar - Bottom Center */
+.ai-prompt-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 90%;
+  max-width: 600px;
+  background: rgba(20, 20, 30, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(99, 102, 241, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ai-prompt-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 16px;
+  font-family: inherit;
+  padding: 8px 0;
+}
+
+.ai-prompt-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle placeholder shimmer animation */
+.ai-prompt-input::placeholder {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.6) 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    rgba(255, 255, 255, 0.6) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: placeholderShimmer 3s ease-in-out infinite;
+}
+
+@keyframes placeholderShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  50% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.ai-prompt-submit {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 20px;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 4px 12px rgba(99, 102, 241, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.ai-prompt-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 
+    0 6px 16px rgba(99, 102, 241, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .create-page {
+    padding: var(--spacing-md);
+  }
+  
+  .create-title {
+    font-size: 2rem;
+  }
+  
+  .create-options {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .create-option {
+    padding: 24px;
+  }
+  
+  .create-option-icon {
+    width: 64px;
+    height: 64px;
+  }
+  
+  .create-option-title {
+    font-size: 20px;
+  }
+  
+  .create-option-description {
+    font-size: 14px;
+  }
+}
+
+/* Animation Integration */
+.create-option {
+  opacity: 0;
+  transform: translateY(40px) scale(0.95);
+  filter: blur(6px);
+  transition: all 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.create-option.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+}
+
+/* Staggered delays */
+.create-option.stagger-1 { transition-delay: 100ms; }
+.create-option.stagger-2 { transition-delay: 200ms; }
+.create-option.stagger-3 { transition-delay: 300ms; }

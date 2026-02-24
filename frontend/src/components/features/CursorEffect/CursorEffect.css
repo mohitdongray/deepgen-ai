@@ -1,0 +1,46 @@
+/**
+ * Cursor Effect Styles - Canvas-based Minimal Particle Trail
+ * 
+ * Styles for the canvas-based cursor effect component
+ * Ensures proper layering and non-interference with page interactions
+ */
+
+/* Canvas container - positioned on top layer */
+.cursor-effect-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* Prevents blocking clicks and interactions */
+  z-index: 9998; /* High z-index but below modals (9999) */
+  opacity: 1;
+  mix-blend-mode: normal; /* Ensures colors render correctly */
+}
+
+/* Performance optimization */
+.cursor-effect-canvas {
+  will-change: transform; /* GPU acceleration hint */
+  transform: translateZ(0); /* Force GPU layer creation */
+}
+
+/* Mobile responsiveness - hide on small screens */
+@media (max-width: 768px) {
+  .cursor-effect-canvas {
+    display: none; /* Disable on mobile for performance */
+  }
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .cursor-effect-canvas {
+    display: none; /* Respect user motion preferences */
+  }
+}
+
+/* High DPI display optimization */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .cursor-effect-canvas {
+    image-rendering: crisp-edges; /* Sharp rendering on retina displays */
+  }
+}

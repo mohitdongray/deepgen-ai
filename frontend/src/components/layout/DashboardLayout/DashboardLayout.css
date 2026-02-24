@@ -1,0 +1,533 @@
+/**
+ * DASHBOARD-LAYOUT-FIX.CSS - Clean Structure for Fixed Navbar
+ * 
+ * Purpose: 
+ * - Remove all parent interference with fixed navbar
+ * - Ensure proper spacing for fixed navbar
+ * - Support 3D background animations
+ * - AI prompt bar at bottom
+ */
+
+/* ========================================
+   DASHBOARD LAYOUT - CLEAN STRUCTURE
+   ======================================== */
+
+.dashboard-layout {
+  /* CRITICAL: Clean properties */
+  position: relative;
+  transform: none;
+  overflow: visible;
+  
+  /* Dimensions */
+  width: 100%;
+  min-height: 100vh;
+  
+  /* Background */
+  background: transparent;
+  
+  /* Spacing */
+  padding: 0;
+  margin: 0;
+  
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========================================
+   NAVBAR WRAPPER - NO INTERFERENCE
+   ======================================== */
+
+.navbar-wrapper {
+  /* CRITICAL: Clean properties */
+  position: relative;
+  transform: none;
+  overflow: visible;
+  
+  /* Dimensions */
+  width: 100%;
+  
+  /* Background */
+  background: transparent;
+  
+  /* Spacing */
+  padding: 0;
+  margin: 0;
+  
+  /* Z-index */
+  z-index: 999;
+  
+  /* Allow interactions */
+  pointer-events: auto;
+}
+
+/* ========================================
+   DASHBOARD MAIN - CONTENT AREA
+   ======================================== */
+
+.dashboard-main {
+  /* CRITICAL: Spacing for fixed navbar */
+  padding-top: 92px; /* 72px modern navbar + 20px breathing room */
+  
+  /* Dimensions */
+  width: 100%;
+  min-height: calc(100vh - 92px);
+  flex: 1;
+  
+  /* Position */
+  position: relative;
+  z-index: 2;
+  
+  /* Background */
+  background: transparent;
+  
+  /* Allow interactions */
+  pointer-events: auto;
+  
+  /* Box model */
+  box-sizing: border-box;
+}
+
+/* ========================================
+   CONTENT WRAPPER (optional)
+   ======================================== */
+
+.content-wrapper {
+  /* Centering */
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+  
+  /* Position */
+  position: relative;
+  
+  /* Box model */
+  box-sizing: border-box;
+}
+
+/* ========================================
+   DASHBOARD SECTIONS
+   ======================================== */
+
+.dashboard-section {
+  position: relative;
+  width: 100%;
+  padding: 4rem 2rem;
+  min-height: auto;
+}
+
+.dashboard-section.full-height {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-section.hero {
+  padding-top: 6rem;
+  min-height: calc(100vh - 80px);
+}
+
+/* ========================================
+   DASHBOARD GRID
+   ======================================== */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  padding: 2rem 0;
+}
+
+/* ========================================
+   DASHBOARD CARDS
+   ======================================== */
+
+.dashboard-card {
+  background: rgba(20, 20, 30, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   AI PROMPT BAR - BOTTOM CENTER
+   ======================================== */
+
+.ai-prompt-bar {
+  /* Fixed positioning at bottom */
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  
+  /* Dimensions */
+  width: 90%;
+  max-width: 600px;
+  
+  /* Z-index */
+  z-index: 1000;
+  
+  /* Glass effect */
+  background: rgba(20, 20, 30, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  
+  /* Border */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  
+  /* Spacing */
+  padding: 16px 20px;
+  
+  /* Layout */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  /* Shadow */
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(99, 102, 241, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  
+  /* Transitions */
+  transition: all 0.3s ease;
+}
+
+.ai-prompt-bar:focus-within {
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(99, 102, 241, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* ========================================
+   AI PROMPT INPUT
+   ======================================== */
+
+.ai-prompt-input {
+  /* Layout */
+  flex: 1;
+  
+  /* Reset */
+  background: transparent;
+  border: none;
+  outline: none;
+  
+  /* Typography */
+  color: #ffffff;
+  font-size: 16px;
+  font-family: inherit;
+  line-height: 1.5;
+  
+  /* Spacing */
+  padding: 8px 0;
+  
+  /* Visibility */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  
+  /* Position */
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.ai-prompt-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ========================================
+   AI PROMPT SUBMIT BUTTON
+   ======================================== */
+
+.ai-prompt-submit {
+  /* Background */
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  
+  /* Border */
+  border: none;
+  border-radius: 10px;
+  
+  /* Spacing */
+  padding: 10px 20px;
+  
+  /* Typography */
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+  
+  /* Cursor */
+  cursor: pointer;
+  
+  /* Shadow */
+  box-shadow: 
+    0 4px 12px rgba(99, 102, 241, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  
+  /* Transitions */
+  transition: all 0.3s ease;
+  
+  /* Layout */
+  flex-shrink: 0;
+  white-space: nowrap;
+  min-width: 80px;
+  min-height: 40px;
+  
+  /* Position */
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.ai-prompt-submit:hover {
+  background: linear-gradient(135deg, #7377f0 0%, #9d6fd9 100%);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 6px 16px rgba(99, 102, 241, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.ai-prompt-submit:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 2px 8px rgba(99, 102, 241, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.ai-prompt-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ========================================
+   LOADING STATES
+   ======================================== */
+
+.dashboard-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 80px);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 18px;
+}
+
+.dashboard-loading::after {
+  content: '';
+  width: 40px;
+  height: 40px;
+  margin-left: 12px;
+  border: 3px solid rgba(99, 102, 241, 0.3);
+  border-top-color: #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   ERROR STATES
+   ======================================== */
+
+.dashboard-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 80px);
+  text-align: center;
+  padding: 2rem;
+}
+
+.dashboard-error-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.dashboard-error-message {
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 2rem;
+  max-width: 500px;
+}
+
+.dashboard-error-button {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #ffffff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dashboard-error-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+  .dashboard-main {
+    padding-top: 84px; /* 64px mobile navbar + 20px */
+  }
+  
+  .content-wrapper {
+    padding: 1rem;
+  }
+  
+  .dashboard-section {
+    padding: 3rem 1rem;
+  }
+  
+  .dashboard-section.hero {
+    padding-top: 4rem;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  /* AI Prompt Bar - Mobile */
+  .ai-prompt-bar {
+    width: 95%;
+    bottom: 16px;
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  
+  .ai-prompt-input {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .ai-prompt-submit {
+    padding: 10px 16px;
+    min-width: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-main {
+    padding-top: 76px; /* 56px mobile navbar + 20px */
+  }
+  
+  .content-wrapper {
+    padding: 0.75rem;
+  }
+  
+  .ai-prompt-bar {
+    width: calc(100% - 32px);
+    bottom: 12px;
+    padding: 10px 12px;
+  }
+  
+  .ai-prompt-input {
+    font-size: 16px;
+    padding: 6px 0;
+  }
+  
+  .ai-prompt-submit {
+    padding: 8px 12px;
+    font-size: 13px;
+    min-width: 60px;
+  }
+}
+
+/* ========================================
+   SCROLL BEHAVIOR
+   ======================================== */
+
+.dashboard-layout {
+  scroll-behavior: smooth;
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+.ai-prompt-input:focus,
+.ai-prompt-submit:focus,
+.dashboard-card:focus {
+  outline: 2px solid rgba(99, 102, 241, 0.6);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-layout,
+  .ai-prompt-bar,
+  .ai-prompt-submit,
+  .dashboard-card {
+    transition: none;
+    animation: none;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .ai-prompt-bar {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+  
+  .ai-prompt-submit {
+    border: 2px solid rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* ========================================
+   PERFORMANCE
+   ======================================== */
+
+.dashboard-layout,
+.dashboard-main,
+.ai-prompt-bar {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ai-prompt-bar,
+.ai-prompt-submit,
+.dashboard-card {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+  .navbar-wrapper,
+  .ai-prompt-bar {
+    display: none;
+  }
+  
+  .dashboard-main {
+    padding-top: 0;
+  }
+}

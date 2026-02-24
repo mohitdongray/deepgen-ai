@@ -1,0 +1,282 @@
+/**
+ * Form Components Styles - Professional Form Styling
+ * 
+ * Modern input fields with focus states, validation, and animations
+ * Consistent with black background theme and gradient system
+ */
+
+/* Base Input Container */
+.input-container,
+.textarea-container,
+.select-container,
+.file-input-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+/* Input Labels */
+.input-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.input-required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+/* Base Input Field */
+.input-field,
+.textarea-field,
+.select-field {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: #ffffff;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.input-field:focus,
+.textarea-field:focus,
+.select-field:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Focus States */
+.input-field--focused,
+.textarea-field--focused,
+.select-field--focused {
+  border-color: #6366f1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Focus Indicators */
+.input-focus-indicator,
+.textarea-focus-indicator,
+.select-focus-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  transition: width 0.3s ease;
+}
+
+.input-focus-indicator--active,
+.textarea-focus-indicator--active,
+.select-focus-indicator--active {
+  width: 100%;
+}
+
+/* Error States */
+.input-field--error,
+.textarea-field--error,
+.select-field--error {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.input-field--error:focus,
+.textarea-field--error:focus,
+.select-field--error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.input-error {
+  display: block;
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin-top: 0.25rem;
+  animation: slideInUp 0.3s ease;
+}
+
+/* Disabled States */
+.input-field--disabled,
+.textarea-field--disabled,
+.select-field--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Text Area Specific */
+.textarea-field {
+  resize: vertical;
+  min-height: 6rem;
+  line-height: 1.5;
+}
+
+/* Select Field Specific */
+.select-field {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.25rem;
+  padding-right: 2.5rem;
+}
+
+/* File Input Specific */
+.file-input {
+  position: relative;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 0.75rem;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.file-input:hover {
+  border-color: #6366f1;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.file-input--drag-over {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.05);
+  transform: scale(1.02);
+}
+
+.file-input-hidden {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.file-input-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.file-input-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.file-input-text {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+}
+
+/* Form Component */
+.form {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form--loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.form-error-message {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  color: #ef4444;
+  font-size: 0.875rem;
+  animation: slideInUp 0.3s ease;
+}
+
+.form-submit-btn {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border: none;
+  border-radius: 0.5rem;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.form-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5558e3 0%, #7c3aed 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.form-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Auto-prompt specific styling */
+.input-field[placeholder="windsurf"] {
+  font-style: italic;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .input-field,
+  .textarea-field,
+  .select-field {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.875rem;
+  }
+  
+  .file-input {
+    padding: 1.5rem;
+  }
+  
+  .form {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .input-field,
+  .textarea-field,
+  .select-field,
+  .file-input {
+    transition: none;
+  }
+  
+  .input-focus-indicator,
+  .textarea-focus-indicator,
+  .select-focus-indicator {
+    transition: none;
+  }
+}

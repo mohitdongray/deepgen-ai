@@ -1,0 +1,379 @@
+/**
+ * Card Alignment Fix - Proper positioning and styling
+ * 
+ * Fixes card alignment issues and ensures proper visibility over 3D background
+ */
+
+/* ✅ STEP 1 — Reset Everything Properly */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background: #000;
+  /* ❌ REMOVED: overflow-x: hidden - breaks sticky positioning */
+}
+
+/* REMOVE all problematic individual card positioning */
+/* Let the natural structure handle spacing */
+
+/* Card Container Alignment - Clean structure */
+.features-grid,
+.card-grid,
+.feature-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 5; /* Above background */
+  /* REMOVED: margin-top, transform - let structure handle it */
+}
+
+/* Individual Card Styling - VERY sharp cinematic edges */
+.feature-card,
+.card {
+  background: rgba(7, 8, 21, 0.98); /* Almost opaque for cinematic look */
+  backdrop-filter: blur(20px); /* Enhanced blur */
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.3); /* MUCH stronger border */
+  border-radius: 0; /* SHARP EDGES - no rounding */
+  clip-path: polygon(
+    0px 0px,
+    calc(100% - 0px) 0px,
+    100% 0px,
+    100% calc(100% - 0px),
+    calc(100% - 0px) 100%,
+    0px 100%,
+    0% calc(100% - 0px),
+    0% 0px
+  ); /* Perfect sharp edges */
+  padding: 3rem; /* More padding for cinematic feel */
+  position: relative;
+  z-index: 5; /* Above background */
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother transition */
+  pointer-events: auto; /* Allow interactions */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 360px; /* Much taller for cinematic look */
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.6), /* VERY dramatic shadow */
+    0 15px 30px rgba(0, 0, 0, 0.4),
+    0 0 0 2px rgba(255, 255, 255, 0.1), /* Sharp edge outline */
+    inset 0 2px 0 rgba(255, 255, 255, 0.15); /* Stronger inner glow */
+}
+
+/* Add visible corner accents for sharp edges */
+.feature-card::before,
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, 
+    transparent 48%, 
+    rgba(99, 102, 241, 0.3) 48%, 
+    rgba(99, 102, 241, 0.3) 52%, 
+    transparent 52%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Add corner highlights for cinematic sharp edges */
+.feature-card::after,
+.card::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(135deg, 
+    rgba(99, 102, 241, 0.4) 0%, 
+    transparent 25%, 
+    transparent 75%, 
+    rgba(139, 92, 246, 0.4) 100%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* VERY cinematic card hover with sharp edges */
+.feature-card:hover,
+.card:hover {
+  transform: translateY(-12px) scale(1.03); /* VERY dramatic lift */
+  box-shadow: 
+    0 40px 80px rgba(99, 102, 241, 0.6), /* STRONG colored glow shadow */
+    0 20px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 3px rgba(99, 102, 241, 0.5), /* VERY sharp border glow */
+    inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  border-color: rgba(99, 102, 241, 0.7); /* MUCH stronger border on hover */
+}
+
+/* Card Content Spacing - Cinematic styling */
+.feature-icon,
+.card-icon {
+  width: 70px; /* Larger for cinematic look */
+  height: 70px;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 0; /* SHARP EDGES for icon too */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem; /* More spacing */
+  color: white;
+  font-size: 1.8rem; /* Larger icon */
+  flex-shrink: 0; /* Prevent icon from shrinking */
+  box-shadow: 
+    0 10px 20px rgba(99, 102, 241, 0.3), /* Icon shadow */
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.feature-title,
+.card-title {
+  font-size: 1.7rem; /* Larger title */
+  font-weight: 700; /* Bolder */
+  margin-bottom: 1.5rem; /* More spacing */
+  color: #ffffff;
+  position: relative;
+  z-index: 6; /* Above card background */
+  flex-shrink: 0; /* Prevent title from shrinking */
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Text shadow for depth */
+}
+
+.feature-description,
+.card-description {
+  color: rgba(255, 255, 255, 0.8); /* More opaque */
+  line-height: 1.7; /* Better readability */
+  margin-bottom: 3rem; /* Much more spacing before button */
+  position: relative;
+  z-index: 6; /* Above card background */
+  flex-grow: 1; /* Allow description to grow */
+  font-size: 1.05rem; /* Slightly larger text */
+}
+
+/* Card Button Styling - Cinematic sharp edges */
+.card-button,
+.feature-cta {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem; /* Larger padding */
+  border-radius: 0; /* SHARP EDGES */
+  font-size: 1rem;
+  font-weight: 700; /* Bolder */
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Smoother transition */
+  position: relative;
+  z-index: 10; /* Well above background */
+  pointer-events: auto; /* Allow interactions */
+  margin-top: auto; /* Push button to bottom */
+  flex-shrink: 0; /* Prevent button from shrinking */
+  width: 100%;
+  max-width: 220px; /* Wider button */
+  align-self: center;
+  margin-bottom: 1rem; /* Add bottom margin too */
+  box-shadow: 
+    0 8px 16px rgba(99, 102, 241, 0.3), /* Button shadow */
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  text-transform: uppercase; /* Cinematic uppercase */
+  letter-spacing: 1px; /* Letter spacing for cinematic feel */
+}
+
+.card-button:hover,
+.feature-cta:hover {
+  transform: translateY(-3px) scale(1.05); /* More dramatic hover */
+  box-shadow: 
+    0 15px 30px rgba(99, 102, 241, 0.5), /* Stronger glow */
+    0 5px 15px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%); /* Reverse gradient on hover */
+}
+
+/* Section Container Alignment - Clean structure */
+.features-section,
+.explore-features-section {
+  padding: 4rem 2rem; /* Clean padding */
+  position: relative;
+  z-index: 3; /* Above background */
+  /* REMOVED: margin-top, transform - let structure handle it */
+}
+
+/* ✅ STEP 5 — Clean Section Headers */
+.features-header,
+.section-header {
+  text-align: center;
+  margin-bottom: 40px; /* Clean margin */
+  /* ❌ REMOVED: margin-top, position: relative */
+}
+
+.features-title,
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 40px; /* Clean margin */
+  background: linear-gradient(135deg, #ffffff 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  /* ❌ REMOVED: position: relative, z-index */
+}
+
+.features-subtitle,
+.section-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 600px;
+  margin: 0 auto 40px auto; /* Clean margins */
+  /* ❌ REMOVED: position: relative, z-index */
+}
+
+/* Hero Section Alignment - Clean structure */
+.hero-section {
+  padding: 4rem 2rem; /* Clean padding */
+  text-align: center;
+  position: relative;
+  z-index: 3; /* Above background */
+  /* REMOVED: margin-top, transform - let structure handle it */
+}
+
+.hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 4; /* Above background */
+  /* REMOVED: transform, margin-top - let structure handle it */
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem; /* Reduced spacing */
+  background: linear-gradient(135deg, #ffffff 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  z-index: 5; /* Above background */
+}
+
+.hero-subtitle {
+  font-size: 1.3rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 2.5rem; /* More spacing before buttons */
+  position: relative;
+  z-index: 5; /* Above background */
+}
+
+/* Premium Container - Move UP */
+.premium-container {
+  position: relative;
+  z-index: 2; /* Above background */
+  transform: translateY(-2rem); /* Move container up */
+  margin-top: -2rem; /* Additional negative margin */
+}
+
+/* Button Alignment - More spacing between text and buttons */
+.hero-actions,
+.cta-container {
+  display: flex;
+  gap: 1.5rem; /* More gap between buttons */
+  justify-content: center;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 6; /* Above background */
+  margin-top: 2rem; /* More spacing above buttons */
+}
+
+.cta-button,
+.primary-button {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+  padding: 1.2rem 2.5rem; /* Larger padding */
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 10; /* Well above background */
+  pointer-events: auto; /* Allow interactions */
+  margin: 0.5rem; /* Individual button margin */
+}
+
+.cta-button:hover,
+.primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+}
+
+.secondary-button {
+  background: transparent;
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 1.2rem 2.5rem; /* Larger padding */
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 10; /* Well above background */
+  pointer-events: auto; /* Allow interactions */
+  margin: 0.5rem; /* Individual button margin */
+}
+
+.secondary-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .features-grid,
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+  
+  .feature-card,
+  .card {
+    padding: 1.5rem;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .features-title,
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .hero-actions,
+  .cta-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .cta-button,
+  .primary-button,
+  .secondary-button {
+    width: 100%;
+    max-width: 300px;
+  }
+}

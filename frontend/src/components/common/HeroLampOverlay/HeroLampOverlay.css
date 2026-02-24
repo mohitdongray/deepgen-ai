@@ -1,0 +1,67 @@
+/* Hero Lamp Overlay - Clean Test Version */
+.hero-lamp-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* Independent cinematic layer */
+.hero-lamp-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Lamp (viewport-based positioning) */
+.hero-lamp {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  animation: lampSwing 4s ease-in-out infinite alternate;
+}
+
+.lamp-wire {
+  width: 2px;
+  height: 140px;
+  background: #555;
+  margin: auto;
+}
+
+.lamp-head {
+  width: 90px;
+  height: 60px;
+  background: #111;
+  border-radius: 50% 50% 30% 30%;
+  box-shadow: 0 15px 50px rgba(255,255,255,0.15);
+}
+
+/* Light Beam (independent) */
+.hero-light {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 650px;
+  height: 700px;
+  background: radial-gradient(
+    ellipse at top,
+    rgba(255,255,255,0.25),
+    rgba(99,102,241,0.15),
+    transparent 70%
+  );
+  filter: blur(60px);
+  z-index: 55;
+}
+
+/* Animations */
+@keyframes lampSwing {
+  from { transform: translateX(-50%) rotate(-2deg); }
+  to { transform: translateX(-50%) rotate(2deg); }
+}

@@ -1,0 +1,99 @@
+/**
+ * Global Black Background Theme - Modern Dark UI
+ * 
+ * Applied globally across all pages for consistent modern dark theme
+ * - Solid black background (#000000)
+ * - Cards maintain #070815 color
+ * - Removed all old gradients (#0F2A4A, #0C2541)
+ * - Professional, clean, cohesive design
+ */
+
+/* Global body and HTML - Solid Black Background */
+html, body {
+  background-color: #000000 !important; /* Force solid black globally */
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  background-color: #000000 !important; /* Ensure root is black */
+  min-height: 100vh;
+}
+
+/* Global theme shell - Modern Solid Black Background */
+.theme-shell {
+  background: #000000 !important; /* Solid black background for modern dark theme */
+  color: #ffffff;
+  min-height: 100vh;
+  position: relative;
+  /* ❌ REMOVED: overflow-x: hidden - breaks sticky positioning */
+}
+
+/* Page-specific backgrounds - All transparent to show black */
+.upload-page,
+.create-page,
+.preview-page,
+.explore-features-page,
+.home-page {
+  background: transparent !important; /* Let global black show through */
+}
+
+/* Remove any remaining gradients from old theme */
+.upload-page,
+.create-page,
+.preview-page,
+.explore-features-page,
+.home-page {
+  background-image: none !important;
+}
+
+/* Ensure cards maintain their #070815 color */
+.premium-container,
+.upload-card,
+.create-card,
+.preview-card,
+.explore-feature-card {
+  background: #070815 !important; /* Keep card color unchanged */
+}
+
+/* Maintain all existing card styling */
+.premium-container,
+.upload-card,
+.create-card,
+.preview-card,
+.explore-feature-card {
+  /* Preserve existing card properties */
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Ensure buttons, forms, and interactive elements keep their styling */
+.btn-primary,
+.btn-secondary,
+.ai-prompt-input,
+.upload-area,
+.create-option {
+  /* Preserve existing component styling */
+}
+
+/* Responsive adjustments remain unchanged */
+@media (max-width: 768px) {
+  .premium-container,
+  .upload-card,
+  .create-card,
+  .preview-card {
+    padding: 24px;
+    margin: 24px 0;
+    border-radius: 16px;
+  }
+}
+
+/* Accessibility - Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  /* Preserve existing reduced motion styles */
+}

@@ -1,0 +1,195 @@
+/**
+ * Gradient Title Styles - Professional Modern Typography
+ * 
+ * Two gradient types for title hierarchy:
+ * 1. Full titles: linear-gradient(135deg, #ffffff 0%, #6366f1 100%)
+ * 2. Partial titles: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)
+ */
+
+/* Full Title Gradient - Main headings, hero sections, page headers */
+.title-gradient-full {
+  background: linear-gradient(135deg, #ffffff 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent; /* Fallback for browsers that don't support text-fill */
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* Partial Title Gradient - Subheadings, section headings, banners */
+.title-gradient-partial {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent; /* Fallback for browsers that don't support text-fill */
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* Hero Section Titles - Full gradient for main impact */
+.hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* Page Header Titles - Full gradient for page identification */
+.page-header-title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #ffffff 0%, #6366f1 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  margin-bottom: 1.5rem;
+}
+
+/* Section Titles - Partial gradient for subtle hierarchy */
+.section-title {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 600;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  margin-bottom: 1rem;
+}
+
+/* Card Titles - Partial gradient for card hierarchy */
+.card-title {
+  font-size: clamp(1.25rem, 2.5vw, 2rem);
+  font-weight: 600;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  margin-bottom: 0.75rem;
+}
+
+/* Feature Card Titles - Partial gradient for feature emphasis */
+.feature-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  margin-bottom: 1rem;
+}
+
+/* Banner Titles - Partial gradient for promotional content */
+.banner-title {
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  font-weight: 700;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Modal/Dialog Titles - Partial gradient for dialogs */
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  margin-bottom: 1rem;
+}
+
+/* Responsive adjustments for gradient titles */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+  
+  .page-header-title {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  
+  .section-title {
+    font-size: clamp(1.25rem, 2.5vw, 2rem);
+  }
+  
+  .card-title {
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+  }
+  
+  .feature-title {
+    font-size: 1.25rem;
+  }
+  
+  .banner-title {
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+  }
+}
+
+/* Accessibility fallback for browsers that don't support text-fill */
+@supports not (-webkit-text-fill-color: transparent) {
+  .title-gradient-full,
+  .title-gradient-partial,
+  .hero-title,
+  .page-header-title,
+  .section-title,
+  .card-title,
+  .feature-title,
+  .banner-title,
+  .modal-title {
+    color: #ffffff;
+    background: none;
+  }
+  
+  .title-gradient-partial,
+  .section-title,
+  .card-title,
+  .feature-title,
+  .banner-title,
+  .modal-title {
+    color: #6366f1;
+  }
+}
+
+/* Animation for gradient titles on hover (subtle effect) */
+.title-gradient-full:hover,
+.title-gradient-partial:hover,
+.hero-title:hover,
+.page-header-title:hover,
+.section-title:hover,
+.card-title:hover,
+.feature-title:hover,
+.banner-title:hover,
+.modal-title:hover {
+  background-position: 100% 0;
+  transition: background-position 0.3s ease;
+}
+
+/* Ensure smooth gradient rendering */
+.title-gradient-full,
+.title-gradient-partial,
+.hero-title,
+.page-header-title,
+.section-title,
+.card-title,
+.feature-title,
+.banner-title,
+.modal-title {
+  background-size: 200% auto;
+  transition: all 0.3s ease;
+}

@@ -1,0 +1,175 @@
+/**
+ * DASHBOARD LAYOUT OPTIMIZED CSS - Production-Ready Layout Structure
+ * 
+ * Purpose: Clean layout foundation for fixed navbar
+ * - Remove all parent interference with fixed positioning
+ * - Ensure natural scrolling on body/html level
+ * - Responsive design with proper spacing
+ * - Support for 3D background animations
+ */
+
+/* ✅ DASHBOARD LAYOUT - Clean structure for fixed navbar */
+.dashboard-layout {
+  background: transparent;          /* No background conflicts */
+  position: relative;              /* Normal flow */
+  width: 100%;                    /* Full width */
+  height: auto;                    /* Natural height */
+  padding: 0;
+  margin: 0;
+  transform: none;                /* Important! No transforms */
+  overflow: visible;              /* Allow fixed positioning */
+  box-sizing: border-box;
+}
+
+/* ✅ NAVBAR WRAPPER - Clean structure */
+.navbar-wrapper {
+  width: 100%;
+  background: transparent;
+  position: relative;              /* Normal flow */
+  padding: 0;
+  margin: 0;
+  transform: none;                /* Important! No transforms */
+  overflow: visible;              /* Allow fixed positioning */
+  box-sizing: border-box;
+  height: 60px;                  /* Match navbar height */
+}
+
+/* ✅ DASHBOARD MAIN - Content spacing and layout */
+.dashboard-main {
+  padding-top: 80px;             /* 60px navbar + 20px spacing */
+  padding-left: 20px;
+  padding-right: 20px;
+  max-width: none;               /* No max-width restriction */
+  width: 100%;                    /* Full width */
+  min-height: calc(100vh - 80px); /* Full viewport minus navbar */
+  box-sizing: border-box;
+  position: relative;              /* Normal flow */
+  background: transparent;          /* Let 3D background show */
+}
+
+/* ✅ RESPONSIVE BREAKPOINTS - Mobile optimization */
+@media (max-width: 1024px) {
+  .dashboard-main {
+    padding-top: 84px;         /* 64px navbar + 20px spacing */
+    min-height: calc(100vh - 84px);
+  }
+  
+  .navbar-wrapper {
+    height: 64px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-main {
+    padding-top: 84px;         /* 64px navbar + 20px spacing */
+    padding-left: 16px;
+    padding-right: 16px;
+    min-height: calc(100vh - 84px);
+  }
+  
+  .navbar-wrapper {
+    height: 64px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-main {
+    padding-top: 76px;         /* 56px navbar + 20px spacing */
+    padding-left: 12px;
+    padding-right: 12px;
+    min-height: calc(100vh - 76px);
+  }
+  
+  .navbar-wrapper {
+    height: 56px;
+  }
+}
+
+/* ✅ AI PROMPT BAR - Fixed positioning optimization */
+.ai-prompt-bar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 90%;
+  max-width: 600px;
+  background: rgba(20, 20, 30, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.ai-prompt-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.ai-prompt-input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(124, 93, 255, 0.3);
+}
+
+.ai-prompt-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.ai-prompt-submit {
+  background: linear-gradient(135deg, #7C5DFF 0%, #6366f1 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.ai-prompt-submit:hover {
+  background: linear-gradient(135deg, #8B6FD9 0%, #7377F0 100%);
+  transform: scale(1.05);
+}
+
+/* ✅ FOOTER - Layout integration */
+footer {
+  width: 100%;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  position: relative;
+  background: transparent;
+}
+
+/* ✅ DEBUG CLASSES - For troubleshooting */
+.dashboard-layout.debug {
+  border: 2px solid green !important;
+}
+
+.navbar-wrapper.debug {
+  border: 2px solid blue !important;
+}
+
+.dashboard-main.debug {
+  border: 2px solid yellow !important;
+}

@@ -1,0 +1,35 @@
+/**
+ * DASHBOARD LAYOUT CSS - Clean Structure for Fixed Navbar
+ * 
+ * Purpose: Remove all parent interference with fixed navbar
+ * Ensure natural scrolling on body/html level
+ */
+
+/* ✅ DASHBOARD LAYOUT - Clean structure */
+.dashboard-layout {
+  background: transparent;          /* No background conflicts */
+  position: relative;              /* Normal flow */
+  width: 100%;                    /* Full width */
+  padding: 0;
+  margin: 0;
+  transform: none;                /* Important! No transforms */
+  overflow: visible;              /* Allow fixed positioning */
+}
+
+/* ✅ NAVBAR WRAPPER - Clean structure */
+.navbar-wrapper {
+  width: 100%;
+  background: transparent;
+  position: relative;              /* Normal flow */
+  padding: 0;
+  margin: 0;
+  transform: none;                /* Important! No transforms */
+  overflow: visible;              /* Allow fixed positioning */
+}
+
+/* ✅ DASHBOARD MAIN - Content spacing */
+.dashboard-main {
+  padding-top: 80px;             /* 60px navbar + 20px spacing */
+  /* Inherits global background */
+  /* No flex or height restrictions */
+}

@@ -1,0 +1,164 @@
+/**
+ * Shared Theme Shell - Global Visual Consistency
+ * 
+ * Provides unified styling across all routes
+ * Ensures consistent background, lighting, and container behavior
+ */
+
+/* ❌ REMOVED: Global pseudo-element fix - was breaking interactions */
+/* *::before, */
+/* *::after { */
+/*   pointer-events: none !important; */
+/* } */
+
+/* Cursor aura container fix */
+.cursor-aura-container,
+.cursor-aura-container * {
+  pointer-events: none !important;
+}
+
+/* Logo floating animation - restricted to logo-float class only */
+/* Only the logo should animate - navbar and buttons remain stationary */
+.logo-float {
+  display: inline-block;
+  animation: logoFloat 6s ease-in-out infinite;
+  will-change: transform;
+  transform-origin: center;
+  text-shadow: 
+    0 0 10px rgba(139, 92, 246, 0.3),
+    0 0 20px rgba(99, 102, 241, 0.2),
+    0 0 30px rgba(255, 255, 255, 0.1);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.logo-float:hover {
+  text-shadow: 
+    0 0 15px rgba(139, 92, 246, 0.5),
+    0 0 25px rgba(99, 102, 241, 0.3),
+    0 0 35px rgba(255, 255, 255, 0.15);
+}
+
+.logo-float::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+  filter: blur(15px);
+  border-radius: 8px;
+  z-index: -1;
+  pointer-events: none;
+  animation: auraFloat 5s ease-in-out infinite;
+}
+
+.logo-float:hover::before {
+  background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+}
+
+/* Ensure other text remains static */
+.hero-title,
+.hero-subtitle,
+.hero-credibility,
+.premium-container h1,
+.premium-container h2,
+.premium-container h3,
+.premium-container p,
+.premium-container span:not(.logo-float) {
+  animation: none !important;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes auraFloat {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    opacity: 0.08;
+  }
+  50% {
+    transform: translateY(-2px) scale(1.02);
+    opacity: 0.1;
+  }
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .logo-float {
+    animation-duration: 6s; /* Consistent with desktop */
+    font-size: 18px; /* Smaller font on mobile */
+  }
+  
+  .logo-float::before {
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .logo-float {
+    animation: none; /* Disable animation for accessibility */
+  }
+}
+
+/* Global theme shell - Modern Solid Black Background */
+.theme-shell {
+  background: #000000; /* Changed: Solid black background for modern dark theme */
+  color: #ffffff;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden; /* Prevent horizontal scrollbar for full-width sections */
+}
+
+/* Prevent horizontal scroll globally */
+body {
+  overflow-x: hidden;
+}
+
+/* Removed: Previous gradient backgrounds - now using solid black globally */
+
+/* Shared content container */
+.shared-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Premium content wrapper */
+.premium-wrapper {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 40px;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.2);
+  margin: 40px 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .shared-container {
+    padding: 0 16px;
+  }
+  
+  .premium-wrapper {
+    padding: 24px;
+    margin: 24px 0;
+    border-radius: 16px;
+  }
+}

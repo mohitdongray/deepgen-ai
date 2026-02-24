@@ -1,0 +1,126 @@
+/**
+ * Futuristic Background CSS - Fixed for proper layering
+ * 
+ * Resolves z-index conflicts and ensures proper content positioning
+ */
+
+.futuristic-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Behind all content */
+  overflow: hidden;
+  background: #000000;
+  pointer-events: none; /* Don't interfere with interactions */
+}
+
+.futuristic-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: optimizeSpeed;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: optimize-contrast;
+  image-rendering: pixelated;
+  -ms-interpolation-mode: nearest-neighbor;
+  pointer-events: none; /* Don't interfere with mouse events */
+}
+
+/* Ensure content stays above background */
+.dashboard-layout,
+.theme-shell,
+.shared-container,
+.navbar,
+.footer,
+.hero-section,
+.features-section,
+.create-page,
+.upload-page,
+.preview-page,
+.explore-features-section {
+  position: relative;
+  z-index: 1; /* Above background */
+  pointer-events: auto; /* Allow interactions */
+}
+
+/* Ensure specific content elements are above background */
+.hero-content,
+.features-container,
+.create-container,
+.upload-container,
+.preview-container,
+.explore-features-container {
+  position: relative;
+  z-index: 2; /* Above background */
+  pointer-events: auto; /* Allow interactions */
+}
+
+/* Ensure buttons and interactive elements work */
+.cta-button,
+.secondary-button,
+.nav-link,
+.feature-card,
+.btn-primary,
+.btn-secondary {
+  position: relative;
+  z-index: 10; /* Well above background */
+  pointer-events: auto; /* Allow interactions */
+}
+
+/* Performance optimizations - REMOVED transforms that break sticky */
+.futuristic-background {
+  will-change: transform;
+  /* ❌ REMOVED: transform: translateZ(0) - breaks sticky */
+  /* ❌ REMOVED: perspective: 1000px - breaks sticky */
+  backface-visibility: hidden;
+}
+
+.futuristic-canvas {
+  will-change: transform;
+  /* ❌ REMOVED: transform: translateZ(0) - breaks sticky */
+  backface-visibility: hidden;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .futuristic-background {
+    transform: none;
+    will-change: auto;
+  }
+  
+  .futuristic-canvas {
+    transform: none;
+    will-change: auto;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .futuristic-background {
+    opacity: 0.7;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .futuristic-canvas {
+    image-rendering: auto;
+  }
+}
+
+/* Accessibility */
+@media (prefers-contrast: high) {
+  .futuristic-background {
+    opacity: 0.8;
+  }
+}
+
+/* Print styles */
+@media print {
+  .futuristic-background {
+    display: none;
+  }
+}
