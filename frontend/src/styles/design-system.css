@@ -1,0 +1,374 @@
+/**
+ * Global Design System — DeepGen AI
+ * ════════════════════════════════════════════════════════════
+ * Single source of truth for the entire site's visual language.
+ * Matches Create.css / Studio.css aesthetic:
+ *   • #050508 deep space background
+ *   • Inter 900 headings with purple→blue gradient
+ *   • Glassmorphic cards with per-accent neon glow
+ *   • Ambient floating orbs
+ *   • Consistent spacing, typography & motion tokens
+ *
+ * Import this ONCE in index.js / App.js — never per-page.
+ * ════════════════════════════════════════════════════════════
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ═══════════════════════════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  min-height: 100%;
+  background: #030305;
+  color: #ffffff;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+}
+
+/* ─── Moving Stars Background (Sora Aesthetic) ─── */
+body::before, body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Layer 1: Small stars moving slow */
+body::before {
+  background: 
+    radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1.2px 1.2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 150px 160px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1px 1px at 90px 40px, #ffffff, rgba(0,0,0,0));
+  background-size: 250px 250px;
+  opacity: 0.12;
+  animation: starsMoveVertical 100s linear infinite;
+}
+
+/* Layer 2: Slightly larger stars moving faster */
+body::after {
+  background: 
+    radial-gradient(1.5px 1.5px at 100px 100px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(2px 2px at 200px 300px, #ffffff, rgba(0,0,0,0)),
+    radial-gradient(1.5px 1.5px at 50px 400px, #ffffff, rgba(0,0,0,0));
+  background-size: 400px 400px;
+  opacity: 0.08;
+  animation: starsMoveVertical 60s linear infinite;
+}
+
+@keyframes starsMoveVertical {
+  from { background-position: 0 0; }
+  to { background-position: 0 1000px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DESIGN TOKENS  (CSS custom properties — use everywhere)
+══════════════════════════════════════════════════════════════ */
+:root {
+  /* ── Background ─────────────────────────────────────────── */
+  --bg-base:        #050508;
+  --bg-surface:     rgba(255,255,255,0.03);
+  --bg-surface-hover: rgba(255,255,255,0.06);
+  --bg-card:        rgba(15,15,25,0.85);
+  --bg-input:       rgba(0,0,0,0.35);
+  --bg-input-focus: rgba(0,0,0,0.55);
+
+  /* ── Accent palette ─────────────────────────────────────── */
+  --accent-purple:  #7c3aed;
+  --accent-purple-l: #8b5cf6;
+  --accent-blue:    #0ea5e9;
+  --accent-green:   #10b981;
+  --accent-pink:    #ec4899;
+  --accent-amber:   #f59e0b;
+
+  /* ── Gradients ──────────────────────────────────────────── */
+  --grad-purple:  linear-gradient(135deg,#4f46e5 0%,#7c3aed 60%,#9333ea 100%);
+  --grad-blue:    linear-gradient(135deg,#0369a1 0%,#0ea5e9 60%,#38bdf8 100%);
+  --grad-green:   linear-gradient(135deg,#047857 0%,#10b981 60%,#34d399 100%);
+  --grad-cta:     linear-gradient(135deg,#6d28d9,#7c3aed 50%,#8b5cf6);
+  --grad-heading: linear-gradient(120deg,#818cf8 0%,#a78bfa 40%,#38bdf8 100%);
+
+  /* ── Glow colours ───────────────────────────────────────── */
+  --glow-purple: rgba(124,58,237,0.35);
+  --glow-blue:   rgba(14,165,233,0.35);
+  --glow-green:  rgba(16,185,129,0.35);
+
+  /* ── Text ───────────────────────────────────────────────── */
+  --text-primary:   #ffffff;
+  --text-secondary: rgba(255,255,255,0.65);
+  --text-muted:     rgba(255,255,255,0.38);
+  --text-accent:    #a78bfa;
+
+  /* ── Borders ────────────────────────────────────────────── */
+  --border-subtle:  rgba(255,255,255,0.07);
+  --border-default: rgba(255,255,255,0.10);
+  --border-active:  rgba(139,92,246,0.45);
+
+  /* ── Radius ─────────────────────────────────────────────── */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-2xl:  24px;
+  --radius-full: 9999px;
+
+  /* ── Spacing (8-pt scale) ───────────────────────────────── */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px; --sp-20: 80px;
+
+  /* ── Typography ─────────────────────────────────────────── */
+  --font-xs:  11px; --font-sm:  13px; --font-base: 15px;
+  --font-md:  17px; --font-lg:  20px; --font-xl:  24px;
+  --font-2xl: 32px; --font-3xl: 40px; --font-4xl: 56px;
+
+  /* ── Shadows ────────────────────────────────────────────── */
+  --shadow-card:  0 12px 40px rgba(0,0,0,0.45), 0 4px 12px rgba(0,0,0,0.25);
+  --shadow-glow:  0 0 0 1px var(--border-active), 0 16px 48px var(--glow-purple);
+  --shadow-btn:   0 4px 20px rgba(124,58,237,0.40);
+  --shadow-btn-h: 0 6px 28px rgba(124,58,237,0.60);
+
+  /* ── Motion ─────────────────────────────────────────────── */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast:  150ms; --dur-normal: 250ms; --dur-slow: 400ms;
+
+  /* Legacy aliases (keep for old components) */
+  --bg-primary:   #050508;
+  --bg-secondary: rgba(15,15,25,0.85);
+  --bg-tertiary:  rgba(255,255,255,0.05);
+  --bg-hover:     rgba(255,255,255,0.07);
+  --accent-purple-hover: #6d28d9;
+  --accent-success: #10b981;
+  --accent-warning: #f59e0b;
+  --accent-error:   #ef4444;
+  --border-color:   rgba(255,255,255,0.10);
+  --border-subtle-old: rgba(255,255,255,0.05);
+  --text-inverse:   #000000;
+  --spacing-xs:  4px; --spacing-sm:  8px;  --spacing-md:  16px;
+  --spacing-lg:  24px; --spacing-xl: 32px;  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+  --radius-full-old: 9999px;
+  --font-size-xs: 12px; --font-size-sm: 14px; --font-size-md: 16px;
+  --font-size-lg: 18px; --font-size-xl: 24px; --font-size-2xl: 32px;
+  --shadow-sm:  0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:  0 4px 6px rgba(0,0,0,0.4);
+  --shadow-lg:  0 10px 15px rgba(0,0,0,0.5);
+  --shadow-glow-old: 0 0 20px rgba(124,58,237,0.3);
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:   350ms ease;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL UTILITY CLASSES
+══════════════════════════════════════════════════════════════ */
+
+/* ── Glass card (use anywhere for consistent cards) ── */
+.ds-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  transition: border-color var(--dur-normal) ease,
+              box-shadow var(--dur-normal) ease;
+}
+.ds-card:hover {
+  border-color: var(--border-active);
+  box-shadow: var(--shadow-glow);
+}
+
+/* ── Gradient heading text ── */
+.ds-gradient-text {
+  background: var(--grad-heading);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Pill / badge ── */
+.ds-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(124,58,237,0.12);
+  border: 1px solid rgba(124,58,237,0.35);
+  border-radius: var(--radius-full);
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-accent);
+  letter-spacing: 0.01em;
+}
+
+/* ── CTA button (primary purple) ── */
+.ds-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--grad-cta);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 12px 24px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: transform var(--dur-fast) ease, box-shadow var(--dur-normal) ease;
+  box-shadow: var(--shadow-btn);
+}
+.ds-btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-btn-h);
+}
+.ds-btn-primary:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+/* ── Ghost button ── */
+.ds-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 9px 16px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background var(--dur-fast), border-color var(--dur-fast), color var(--dur-fast);
+}
+.ds-btn-ghost:hover {
+  background: var(--bg-surface-hover);
+  border-color: rgba(255,255,255,0.2);
+  color: var(--text-primary);
+}
+
+/* ── Input / Textarea ── */
+.ds-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  color: var(--text-primary);
+  font-size: var(--font-base);
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color var(--dur-fast), box-shadow var(--dur-fast), background var(--dur-fast);
+  caret-color: var(--accent-purple-l);
+}
+.ds-input:focus {
+  border-color: rgba(139,92,246,0.55);
+  background: var(--bg-input-focus);
+  box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
+}
+.ds-input::placeholder { color: var(--text-muted); }
+
+/* ── Section heading ── */
+.ds-section-heading {
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+/* ── Section subheading ── */
+.ds-section-sub {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 580px;
+  font-weight: 400;
+}
+
+/* Ambient orb utility removed — switching to clean star background */
+
+/* ── Tag chip ── */
+.ds-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 3px 10px;
+  letter-spacing: 0.02em;
+}
+
+/* ── Divider with label ── */
+.ds-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+.ds-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
+.ds-divider span {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* ── Error banner ── */
+.ds-error {
+  background: rgba(239,68,68,0.09);
+  border: 1px solid rgba(239,68,68,0.28);
+  color: #fca5a5;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Loading spinner ── */
+.ds-spinner {
+  width: 38px;
+  height: 38px;
+  border: 3px solid rgba(255,255,255,0.08);
+  border-top-color: var(--accent-purple-l);
+  border-radius: 50%;
+  animation: dsSpin 0.9s linear infinite;
+}
+@keyframes dsSpin { to { transform: rotate(360deg); } }
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(139,92,246,0.25);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(139,92,246,0.45); }
+
+/* ── Selection ── */
+::selection { background: rgba(124,58,237,0.3); color: #fff; }

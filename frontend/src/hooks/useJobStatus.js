@@ -7,7 +7,6 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { getVideoStatus } from '../services/videoService';
 
 export const useJobStatus = (jobId) => {
   const [status, setStatus] = useState('pending'); // pending, processing, completed, failed
@@ -19,12 +18,13 @@ export const useJobStatus = (jobId) => {
     if (!jobId) return;
 
     try {
-      const response = await getVideoStatus(jobId);
+      const res = await fetch(`http://localhost:5000/api/status/${jobId}`);
+      const response = await res.json();
       setStatus(response.status);
       setPollCount((prev) => prev + 1);
 
       if (response.status === 'completed') {
-        setResult(response.result);
+        setResult(response);
       } else if (response.status === 'failed') {
         setError(response.error || 'Video generation failed.');
       }

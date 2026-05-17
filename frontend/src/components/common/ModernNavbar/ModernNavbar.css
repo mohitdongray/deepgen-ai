@@ -5,17 +5,23 @@
 .modern-navbar {
   position: fixed;
   top: 0;
-  width: 100%;
+  left: 0;
+  right: 0;
+  width: 100vw;          /* viewport-relative — zoom-proof */
+  box-sizing: border-box;
   z-index: 1000;
   background: rgba(10,10,10,0.95);
   border-bottom: 1px solid rgba(255,255,255,0.1);
+  transform: none !important; /* prevent any accidental transform shifts */
 }
 
 .navbar-container {
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   padding: 0 24px;
   height: 72px;
+  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -113,19 +119,41 @@
 
 .generate-dropdown {
   position: absolute;
-  top: 100%;
-  left: 0;
-  background: rgba(20,20,30,0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(11, 15, 25, 0.95);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
   padding: 12px;
   gap: 8px;
-  min-width: 200px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  min-width: 220px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
   z-index: 10000;
   flex-direction: column;
   display: none;
+}
+
+.generate-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+}
+
+/* Invisible bridge to prevent dropdown from closing when cursor crosses the gap */
+.generate-dropdown::after {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 0;
+  right: 0;
+  height: 15px;
+  background: transparent;
 }
 
 .nav-item-container:hover .generate-dropdown {
@@ -136,28 +164,54 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px;
-  border-radius: 8px;
-  color: #ffffff; /* fully white */
+  padding: 12px 16px;
+  border-radius: 10px;
+  color: #e2e8f0;
   text-decoration: none;
   transition: all 0.2s ease;
+  background: transparent;
+  border: 1px solid transparent;
 }
 
 .dropdown-item:hover {
-  background: rgba(99, 102, 241, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
   color: #ffffff;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .dropdown-icon {
-  font-size: 18px;
+  font-size: 20px;
   width: 24px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .dropdown-title {
   font-size: 14px;
   font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* Individual Glow effects based on the item */
+.dropdown-item:nth-child(1):hover {
+  border-color: rgba(59, 130, 246, 0.5); /* Blue */
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+.dropdown-item:nth-child(2):hover {
+  border-color: rgba(168, 85, 247, 0.5); /* Purple */
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
+}
+.dropdown-item:nth-child(3):hover {
+  border-color: rgba(34, 197, 94, 0.5); /* Green */
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+}
+.dropdown-item:nth-child(4):hover {
+  border-color: rgba(249, 115, 22, 0.5); /* Orange */
+  box-shadow: 0 0 15px rgba(249, 115, 22, 0.2);
 }
 
 /* ACTION BUTTONS */
@@ -267,4 +321,376 @@
   .navbar-container { padding: 0 16px; }
   .modern-navbar { height: 64px; }
   .mobile-menu { top: 64px; }
+}
+
+/* ========================================
+   USER MENU (signed-in state)
+======================================== */
+.user-menu-container {
+  position: relative;
+}
+
+.user-avatar-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 40px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.user-avatar-btn:hover {
+  background: rgba(99,102,241,0.15);
+  border-color: rgba(99,102,241,0.35);
+}
+
+.user-avatar-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-name-label {
+  font-size: 14px;
+  font-weight: 500;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  background: rgba(20,20,30,0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  z-index: 10001;
+}
+
+.user-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.user-dropdown-item:hover {
+  background: rgba(239,68,68,0.15);
+  color: #f87171;
+}
+
+/* ========================================
+   SIGN-IN MODAL OVERLAY
+======================================== */
+.signin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  animation: overlayFadeIn 0.3s ease forwards;
+}
+
+@keyframes overlayFadeIn {
+  to { opacity: 1; }
+}
+
+/* ── Modal Card ── */
+.signin-modal {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  margin: 16px;
+  padding: 40px 32px 32px;
+  background: rgba(16,16,24,0.92);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  backdrop-filter: blur(24px);
+  box-shadow:
+    0 24px 64px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(99,102,241,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  animation: modalSlideUp 0.35s cubic-bezier(.21,1.02,.73,1) forwards;
+  transform: translateY(24px) scale(0.97);
+  opacity: 0;
+}
+
+@keyframes modalSlideUp {
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Close */
+.signin-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.signin-close:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+/* ── Header ── */
+.signin-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.signin-logo-ring {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 0 24px rgba(99,102,241,0.35);
+}
+
+.signin-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 4px;
+}
+
+.signin-subtitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  margin: 0;
+}
+
+/* ── Form ── */
+.signin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.signin-error {
+  padding: 10px 14px;
+  background: rgba(239,68,68,0.12);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 10px;
+  color: #f87171;
+  font-size: 13px;
+  text-align: center;
+}
+
+.signin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.signin-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: 0.02em;
+}
+
+.signin-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.signin-input-icon {
+  position: absolute;
+  left: 14px;
+  color: rgba(255,255,255,0.3);
+  pointer-events: none;
+}
+
+.signin-input {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.signin-input::placeholder {
+  color: rgba(255,255,255,0.25);
+}
+
+.signin-input:focus {
+  border-color: rgba(99,102,241,0.5);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+}
+
+.signin-toggle-pw {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.35);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.signin-toggle-pw:hover {
+  color: rgba(255,255,255,0.7);
+}
+
+/* ── Options row ── */
+.signin-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.signin-remember {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  cursor: pointer;
+}
+
+.signin-remember input[type="checkbox"] {
+  accent-color: #667eea;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.signin-forgot {
+  background: none;
+  border: none;
+  color: #818cf8;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.signin-forgot:hover {
+  color: #a5b4fc;
+}
+
+/* ── Submit button ── */
+.signin-submit {
+  width: 100%;
+  padding: 13px;
+  margin-top: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+}
+
+.signin-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(102,126,234,0.35);
+}
+
+.signin-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ── Spinner ── */
+.signin-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spinRotate 0.65s linear infinite;
+}
+
+@keyframes spinRotate {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Footer text ── */
+.signin-footer-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+}
+
+.signin-link {
+  background: none;
+  border: none;
+  color: #818cf8;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.signin-link:hover {
+  color: #a5b4fc;
+}
+
+/* ── Mobile responsive ── */
+@media (max-width: 480px) {
+  .signin-modal {
+    padding: 32px 20px 24px;
+    border-radius: 16px;
+  }
 }

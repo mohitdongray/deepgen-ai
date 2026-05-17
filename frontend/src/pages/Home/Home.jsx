@@ -98,22 +98,44 @@ const Home = () => {
     {
       icon: <Zap size={24} />,
       title: 'Fast AI Generation',
-      description: 'Generate videos in minutes with our optimized AI pipeline and cloud infrastructure.'
+      description: 'Generate videos in minutes with our optimized AI pipeline and cloud infrastructure.',
+      color: '#3b82f6',
+      bgGradient: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)'
     },
     {
       icon: <Shield size={24} />,
       title: 'Consent-based & Ethical',
-      description: 'Built with explicit consent verification and strict ethical guidelines for responsible usage.'
+      description: 'Built with explicit consent verification and strict ethical guidelines for responsible usage.',
+      color: '#10b981',
+      bgGradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)'
     },
     {
       icon: <Globe size={24} />,
       title: 'API-first Platform',
-      description: 'Enterprise-grade APIs with comprehensive documentation and developer-friendly integration.'
+      description: 'Enterprise-grade APIs with comprehensive documentation and developer-friendly integration.',
+      color: '#f59e0b',
+      bgGradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)'
     },
     {
       icon: <Users size={24} />,
       title: 'High Quality Output',
-      description: 'Professional-grade video generation with advanced AI models and quality assurance.'
+      description: 'Professional-grade video generation with advanced AI models and quality assurance.',
+      color: '#ec4899',
+      bgGradient: 'linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)'
+    },
+    {
+      icon: <Camera size={24} />,
+      title: 'Smart Face Mapping',
+      description: 'Precision facial recognition and mapping technology for seamless, natural-looking results.',
+      color: '#06b6d4',
+      bgGradient: 'linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)'
+    },
+    {
+      icon: <Layers size={24} />,
+      title: 'Multi-layer Compositing',
+      description: 'Combine audio, video, and effects with intelligent layering for cinematic productions.',
+      color: '#8b5cf6',
+      bgGradient: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%)'
     }
   ];
 
@@ -148,9 +170,9 @@ const Home = () => {
                   </div>
                   
                   <div className="hero-actions reveal">
-                    <Link to="/upload" className="cta-button">
+                    <Link to="/create" className="cta-button">
                       <Play size={20} />
-                      Create Video
+                      Create
                     </Link>
                     <Link to="/explore-features" className="secondary-button">
                       Explore Features
@@ -206,8 +228,19 @@ const Home = () => {
               </div>
               <div className="features-grid">
                 {features.map((feature, index) => (
-                  <div key={index} className="feature-card">
-                    <div className="feature-icon">
+                  <div 
+                    key={index} 
+                    className="feature-card colorful-card"
+                    style={{ '--card-color': feature.color }}
+                  >
+                    <div 
+                      className="feature-icon"
+                      style={{ 
+                        color: feature.color, 
+                        background: feature.bgGradient,
+                        borderColor: `color-mix(in srgb, ${feature.color} 30%, transparent)`
+                      }}
+                    >
                       {feature.icon}
                     </div>
                     {/* Feature Title with Partial Gradient */}
@@ -219,44 +252,7 @@ const Home = () => {
             </div>
           </section>
 
-          {/* Credibility Section */}
-          <section className="credibility-section">
-            <div className="credibility-container">
-              <div className="credibility-header">
-                <h2 className="credibility-title">
-                  Trusted by creators worldwide
-                </h2>
-                <p className="credibility-subtitle">
-                  Join thousands of professionals using our platform to create 
-                  stunning AI-generated content
-                </p>
-              </div>
-              <div className="credibility-stats">
-                <div className="stat-item">
-                  <div className="stat-number">10K+</div>
-                  <div className="stat-label">Active Users</div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-number">50K+</div>
-                  <div className="stat-label">Videos Created</div>
-                </div>
-                <div className="stat-item">
-                  <div className="stat-number">99.9%</div>
-                  <div className="stat-label">Uptime</div>
-                </div>
-              </div>
-              <div className="testimonials">
-                <div className="testimonial-card">
-                  <p>"This platform has revolutionized our video production workflow."</p>
-                  <div className="testimonial-author">- Marketing Director</div>
-                </div>
-                <div className="testimonial-card">
-                  <p>"The quality of AI-generated videos is absolutely stunning."</p>
-                  <div className="testimonial-author">- Content Creator</div>
-                </div>
-              </div>
-            </div>
-          </section>
+          {/* Credibility Section Removed */}
         </div>
       </div>
     </div>

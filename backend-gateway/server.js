@@ -38,8 +38,6 @@ const PORT = process.env.PORT || 5000;
 // Import middleware and routes
 const errorHandler = require('./middleware/errorHandler');
 const securityHeaders = require('./middleware/security');
-const requestValidator = require('./middleware/requestValidator');
-const videoRoutes = require('./routes/videoRoutes');
 const generateRoute = require('./routes/generateRoute');
 
 // Trust proxy for rate limiting behind reverse proxy
@@ -75,8 +73,12 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
-app.use('/api', videoRoutes);
 app.use('/api', generateRoute);
+
+// Test route to verify server is working
+app.get('/test', (req, res) => {
+  res.json({ status: "Node working", port: 5000 });
+});
 
 // 404 handler
 app.use((req, res) => {

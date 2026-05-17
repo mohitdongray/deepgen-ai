@@ -29,9 +29,7 @@ const connectDB = async () => {
   } catch (error) {
     console.error('❌ MongoDB Atlas Connection Error:');
     console.error('Error Details:', error.message);
-    
-    // Exit process with failure
-    process.exit(1);
+    console.warn('⚠️  Server will continue without MongoDB. Some features may be unavailable.');
   }
 };
 

@@ -1,2 +1,0 @@
-# Models package
-# Pydantic schemas and data models

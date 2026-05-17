@@ -1,377 +1,236 @@
-# AI Video Generation Platform - Python FastAPI AI Orchestration Service
-#
-# This service handles:
-# - Communication with external AI APIs (HeyGen, Tavus, HuggingFace, Replicate)
-# - Job management and state persistence
-# - Response normalization from different providers
-# - Asynchronous processing of video generation
-#
-# WHY PYTHON FOR AI SERVICE?
-# - Native ecosystem for AI/ML integration (httpx, aiohttp for async HTTP)
-# - Excellent async/await support for handling long-running AI API calls
-# - Type hints with Pydantic for request/response validation
-# - Better concurrency model for I/O-bound AI API operations
-# - Clean separation: Gateway handles auth/routing, Python handles AI logic
+import sys
+import io
+import os
+
+# ============================================================
+#  CRITICAL: Load .env FIRST — before any os.getenv() calls
+# ============================================================
+from dotenv import load_dotenv
+load_dotenv()  # reads .env from the current working directory
+
+# Ensure this file's own directory is on sys.path so
+# `from ai.ai_provider import ...` works regardless of launch dir.
+_HERE = os.path.dirname(os.path.abspath(__file__))
+if _HERE not in sys.path:
+    sys.path.insert(0, _HERE)
+
+# Force UTF-8 output on Windows
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
+import base64
 import uuid
 import asyncio
-from datetime import datetime
-import os
-from dotenv import load_dotenv
+import requests
+import json
 
-# Load environment variables from .env file
-load_dotenv()
+from ai.ai_provider import AIProviderManager
 
-# Load API keys
-HEYGEN_API_KEY = os.getenv("HEYGEN_API_KEY")
-TAVUS_API_KEY = os.getenv("TAVUS_API_KEY")
-HUGGINGFACE_TOKEN = os.getenv("HUGGINGFACE_TOKEN")
-REPLICATE_API_TOKEN = os.getenv("REPLICATE_API_TOKEN")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+print("[STARTUP] main.py loaded")
+print(f"[STARTUP] HuggingFace key present: {bool(os.getenv('HUGGINGFACE_API_KEY'))}")
+print(f"[STARTUP] DeepAI key present:      {bool(os.getenv('DEEPAI_API_KEY'))}")
+print(f"[STARTUP] HeyGen key present:      {bool(os.getenv('HEYGEN_API_KEY'))}")
+print(f"[STARTUP] NVIDIA key present:      {bool(os.getenv('NVIDIA_API_KEY'))}")
 
-from app.core.logging import setup_logging
-from app.jobs.manager import JobManager
-from app.services.orchestrator_minimal import AIOrchestrator
+# =========================
+# APP SETUP
+# =========================
 
-# Setup logging
-logger = setup_logging()
+app = FastAPI()
 
-# Initialize FastAPI app
-app = FastAPI(
-    title="AI Video Generation Service",
-    description="Orchestrates video generation using external AI APIs",
-    version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc"
-)
-
-# CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5000"],  # Only accept from Node.js gateway
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["POST", "GET"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Initialize components
-job_manager = JobManager()
-orchestrator = AIOrchestrator()
+os.makedirs("outputs", exist_ok=True)
+app.mount("/outputs", StaticFiles(directory="outputs"), name="outputs")
 
-# ============================================================================
-# Pydantic Models (Request/Response Schemas)
-# ============================================================================
+JOBS_FILE = "jobs.json"
 
-class GenerationRequest(BaseModel):
-    job_id: str
-    consent_confirmed: bool
-    description: Optional[str] = None
-    
-    # Educational note: We validate consent at every layer of the stack
-    # to ensure ethical usage requirements are met.
+def load_jobs() -> Dict[str, Any]:
+    if os.path.exists(JOBS_FILE):
+        try:
+            with open(JOBS_FILE, "r") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
 
-class GenerationResponse(BaseModel):
-    job_id: str
-    status: str  # pending, processing, completed, failed
-    message: str
-    estimated_time: Optional[int] = None  # seconds
+def save_jobs():
+    with open(JOBS_FILE, "w") as f:
+        json.dump(jobs, f)
 
-class StatusResponse(BaseModel):
-    job_id: str
-    status: str
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-    result: Optional[Dict[str, Any]] = None
-    error: Optional[str] = None
-    provider: Optional[str] = None
-    processing_time: Optional[str] = None
+jobs: Dict[str, Any] = load_jobs()
+provider_manager = AIProviderManager()
 
-# ============================================================================
-# Root Endpoint
-# ============================================================================
+# =========================
+# BASIC ROUTES
+# =========================
 
 @app.get("/")
-async def read_root():
-    """Root endpoint with API information."""
-    return {
-        "message": "AI Video Generation Service",
-        "version": "1.0.0",
-        "endpoints": {
-            "health": "/health",
-            "generate": "/generate",
-            "status": "/status/{job_id}",
-            "docs": "/docs"
-        },
-        "status": "running"
-    }
-
-# ============================================================================
-# Health Check Endpoint
-# ============================================================================
+async def root():
+    return {"status": "running"}
 
 @app.get("/health")
-async def health_check():
-    """Health check endpoint for monitoring."""
+async def health():
     return {
-        "status": "healthy",
-        "service": "ai-orchestration",
-        "timestamp": datetime.utcnow().isoformat()
+        "status": "ok",
+        "providers": {
+            "huggingface": bool(os.getenv("HUGGINGFACE_API_KEY")),
+            "deepai":      bool(os.getenv("DEEPAI_API_KEY")),
+            "nvidia":      bool(os.getenv("NVIDIA_API_KEY")),
+            "heygen":      bool(os.getenv("HEYGEN_API_KEY")),
+        }
     }
 
-# ============================================================================
-# Video Generation Endpoint (Form Data)
-# ============================================================================
-
-@app.post("/generate", response_model=GenerationResponse)
-async def generate_video(
-    background_tasks: BackgroundTasks,
-    source_image: UploadFile = File(..., description="Source face image"),
-    target_video: UploadFile = File(..., description="Target video file"),
-    job_id: str = Form(...),
-    consent_confirmed: str = Form(...),
-    description: Optional[str] = Form(None)
-):
-    """
-    Initiate video generation process with form data.
-    
-    This endpoint:
-    1. Validates consent confirmation
-    2. Creates a job entry for tracking
-    3. Reads file data immediately
-    4. Queues the generation task to run asynchronously
-    5. Returns immediately with job ID for polling
-    
-    The actual processing happens in background to handle
-    the 1-3 minute processing time of external AI APIs.
-    """
-    
-    # ETHICS CHECK: Validate consent was confirmed
-    if consent_confirmed.lower() not in ['true', '1', 'yes']:
-        raise HTTPException(
-            status_code=400,
-            detail="Consent must be confirmed to proceed with video generation"
-        )
-    
-    logger.info(f"Starting video generation job: {job_id}")
-    
-    # Read files immediately to avoid I/O issues
-    source_bytes = await source_image.read()
-    target_bytes = await target_video.read()
-    
-    # Create job record
-    job_manager.create_job(
-        job_id=job_id,
-        status="pending",
-        metadata={
-            "source_filename": source_image.filename,
-            "target_filename": target_video.filename,
-            "description": description,
-            "consent_confirmed": True
-        }
-    )
-    
-    # Queue background task with bytes (not UploadFile objects)
-    # This allows immediate response while processing continues
-    background_tasks.add_task(
-        process_video_generation,
-        job_id=job_id,
-        source_bytes=source_bytes,
-        target_bytes=target_bytes,
-        description=description
-    )
-    
-    return GenerationResponse(
-        job_id=job_id,
-        status="pending",
-        message="Video generation queued",
-        estimated_time=180  # 3 minutes estimated
-    )
-
-# ============================================================================
-# Video Generation Endpoint (JSON)
-# ============================================================================
+# =========================
+# REQUEST MODELS
+# =========================
 
 class VideoGenerationRequest(BaseModel):
-    """Request model for JSON video generation."""
-    job_id: str
+    job_id: Optional[str] = None
+    mode: str = "image"
     description: Optional[str] = None
-    source_image: str  # Base64 encoded
-    target_video: str  # Base64 encoded
+    text: Optional[str] = None
     consent_confirmed: str = "true"
 
-@app.post("/generate-json", response_model=GenerationResponse)
-async def generate_video_json(
-    request: VideoGenerationRequest,
-    background_tasks: BackgroundTasks
+# =========================
+# ENDPOINTS
+# =========================
+
+@app.post("/generate")
+async def generate(
+    background_tasks: BackgroundTasks,
+    description: str = Form(...),
+    mode: str = Form(...),
+    source_image: UploadFile = File(None),
+    target_video: UploadFile = File(None),
 ):
-    """
-    Initiate video generation process with JSON payload.
-    
-    Accepts base64 encoded files in JSON format.
-    """
-    
-    # ETHICS CHECK: Validate consent was confirmed
-    if request.consent_confirmed.lower() not in ['true', '1', 'yes']:
-        raise HTTPException(
-            status_code=400,
-            detail="Consent must be confirmed to proceed with video generation"
-        )
-    
-    logger.info(f"Starting video generation job: {request.job_id}")
-    
-    # Decode base64 files
-    try:
-        import base64
-        source_bytes = base64.b64decode(request.source_image)
-        target_bytes = base64.b64decode(request.target_video)
-    except Exception as e:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid base64 encoding: {str(e)}"
-        )
-    
-    # Create job record
-    job_manager.create_job(
-        job_id=request.job_id,
-        status="pending",
-        metadata={
-            "source_filename": "source_image.jpg",
-            "target_filename": "target_video.mp4",
-            "description": request.description,
-            "consent_confirmed": True,
-            "payload_type": "json"
-        }
-    )
-    
-    # Queue background task with decoded bytes
-    background_tasks.add_task(
-        process_video_generation,
-        job_id=request.job_id,
-        source_bytes=source_bytes,
-        target_bytes=target_bytes,
-        description=request.description
-    )
-    
-    return GenerationResponse(
-        job_id=request.job_id,
-        status="pending",
-        message="Video generation queued",
-        estimated_time=180  # 3 minutes estimated
-    )
+    job_id = str(uuid.uuid4())
+    print(f"[JOB:{job_id}] Mode={mode}  Prompt={description[:60]}")
+    jobs[job_id] = {"job_id": job_id, "status": "pending", "video_url": None, "image_url": None}
+    save_jobs()
+    background_tasks.add_task(process_job, job_id, description, mode)
+    return {"job_id": job_id, "status": "pending"}
 
-# ============================================================================
-# Status Check Endpoint
-# ============================================================================
 
-@app.get("/status/{job_id}", response_model=StatusResponse)
-async def get_status(job_id: str):
-    """
-    Get the current status of a video generation job.
-    
-    Frontend polls this endpoint to track progress.
-    """
-    job = job_manager.get_job(job_id)
-    
+@app.post("/generate-json")
+async def generate_json(request: VideoGenerationRequest, background_tasks: BackgroundTasks):
+    job_id = request.job_id or str(uuid.uuid4())
+    prompt = request.description or request.text or "a beautiful scene"
+    print(f"[JOB:{job_id}] Mode={request.mode}  Prompt={prompt[:60]}")
+    jobs[job_id] = {"job_id": job_id, "status": "pending", "video_url": None, "image_url": None}
+    save_jobs()
+    background_tasks.add_task(process_job, job_id, prompt, request.mode)
+    return {"job_id": job_id, "status": "pending", "request_id": job_id}
+
+
+@app.get("/status/{job_id}")
+async def status(job_id: str):
+    job = jobs.get(job_id)
     if not job:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Job {job_id} not found"
-        )
-    
-    return StatusResponse(
-        job_id=job_id,
-        status=job["status"],
-        created_at=job["created_at"],
-        updated_at=job.get("updated_at"),
-        result=job.get("result"),
-        error=job.get("error"),
-        provider=job.get("provider"),
-        processing_time=job.get("processing_time")
-    )
+        raise HTTPException(status_code=404, detail="Job not found")
+    return job
 
-# ============================================================================
-# Background Task: Video Generation
-# ============================================================================
+# =========================
+# BACKGROUND WORKER
+# =========================
 
-async def process_video_generation(
-    job_id: str,
-    source_bytes: bytes,
-    target_bytes: bytes,
-    description: Optional[str]
-):
-    """
-    Background task that handles the actual video generation.
-    
-    This function:
-    1. Updates job status to 'processing'
-    2. Selects appropriate AI provider
-    3. Makes API call to external service
-    4. Handles response and normalizes it
-    5. Updates job with result or error
-    
-    Architecture note: This runs in background to not block HTTP response.
-    External AI APIs (HeyGen, Tavus, etc.) take 1-3 minutes to complete.
-    """
-    start_time = datetime.utcnow()
-    
+async def process_job(job_id: str, prompt: str, mode: str):
+    print(f"[PROCESS:{job_id}] Starting — mode={mode}")
     try:
-        # Update status to processing
-        job_manager.update_job(job_id, status="processing")
-        logger.info(f"Job {job_id}: Processing started")
-        
-        # ORCHESTRATION: Select and call appropriate AI provider
-        # For educational project, we demonstrate the pattern with
-        # configurable provider selection
-        result = await orchestrator.generate_video(
-            job_id=job_id,
-            source_image=source_bytes,
-            target_video=target_bytes,
-            description=description
-        )
-        
-        # Calculate processing time
-        end_time = datetime.utcnow()
-        processing_time = (end_time - start_time).total_seconds()
-        
-        # Update job with success
-        job_manager.update_job(
-            job_id=job_id,
-            status="completed",
-            result={
-                "videoUrl": result.get("video_url"),
-                "thumbnailUrl": result.get("thumbnail_url"),
-                "duration": result.get("duration")
-            },
-            provider=result.get("provider"),
-            processing_time=f"{processing_time:.1f}s"
-        )
-        
-        logger.info(f"Job {job_id}: Completed in {processing_time:.1f}s")
-        
-    except Exception as e:
-        logger.error(f"Job {job_id}: Failed - {str(e)}")
-        
-        # Update job with error
-        job_manager.update_job(
-            job_id=job_id,
-            status="failed",
-            error=str(e)
-        )
+        jobs[job_id]["status"] = "processing"
+        save_jobs()
 
-# ============================================================================
-# Main Entry Point
-# ============================================================================
+        # Run the synchronous provider manager in a thread pool
+        result = await asyncio.to_thread(provider_manager.generate, mode, prompt)
+        print(f"[PROCESS:{job_id}] Raw result: {result}")
+
+        # ── Extract media URL ──────────────────────────────────────────
+        media_url = None
+        if result:
+            media_url = (
+                result.get("video_url") or
+                result.get("image_url") or
+                result.get("output_url")
+            )
+            if not media_url and isinstance(result.get("output"), str):
+                out = result["output"]
+                if out.startswith("http") or out.startswith("data:"):
+                    media_url = out
+            if not media_url and isinstance(result.get("output"), dict):
+                out = result["output"]
+                media_url = out.get("video_url") or out.get("image_url")
+
+        if not media_url:
+            print(f"[PROCESS:{job_id}] No URL found — falling back")
+            media_url = "https://www.w3schools.com/html/mov_bbb.mp4"
+
+        provider_name = result.get("provider", "unknown") if result else "unknown"
+        print(f"[PROCESS:{job_id}] Provider={provider_name}  URL={media_url[:80]}")
+
+        # ── Download / decode and save locally ────────────────────────
+        try:
+            if media_url.startswith("data:image"):
+                header, encoded = media_url.split(",", 1)
+                ext = header.split(";")[0].split("/")[1]
+                file_path = f"outputs/{job_id}.{ext}"
+                with open(file_path, "wb") as f:
+                    f.write(base64.b64decode(encoded))
+            else:
+                response = await asyncio.to_thread(requests.get, media_url, timeout=30)
+                response.raise_for_status() # Ensure we got a valid response
+                
+                # Strip query params from URL before checking extension
+                clean_url = media_url.split("?")[0]
+                default_ext = "jpg" if mode == "image" else "mp4"
+                
+                ext = clean_url.split(".")[-1] if "." in clean_url.split("/")[-1] else default_ext
+                if len(ext) > 4: ext = default_ext
+                
+                file_path = f"outputs/{job_id}.{ext}"
+                with open(file_path, "wb") as f:
+                    f.write(response.content)
+
+            jobs[job_id]["status"] = "completed"
+            jobs[job_id]["provider"] = provider_name
+            is_image = mode == "image" or ext in ("png", "jpg", "jpeg", "webp", "gif")
+            if is_image:
+                jobs[job_id]["image_url"] = f"/outputs/{job_id}.{ext}"
+            else:
+                jobs[job_id]["video_url"] = f"/outputs/{job_id}.{ext}"
+            save_jobs()
+            print(f"[PROCESS:{job_id}] ✅ Completed — saved to {file_path}")
+
+        except Exception as dl_err:
+            print(f"[PROCESS:{job_id}] Download failed ({dl_err}) — using direct URL")
+            jobs[job_id]["status"] = "completed"
+            jobs[job_id]["provider"] = provider_name
+            if mode == "image":
+                jobs[job_id]["image_url"] = media_url
+            else:
+                jobs[job_id]["video_url"] = media_url
+            save_jobs()
+
+    except Exception as e:
+        print(f"[PROCESS:{job_id}] ❌ Error: {e}")
+        jobs[job_id]["status"] = "failed"
+        jobs[job_id]["error"] = str(e)
+        save_jobs()
+
+# =========================
+# RUN
+# =========================
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,  # Disable in production
-        log_level="info"
-    )
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

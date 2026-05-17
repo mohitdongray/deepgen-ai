@@ -64,17 +64,19 @@ router.post(
       const jobId = uuidv4();
       
       // Forward request to Python AI service
+      const FormData = require('form-data');
       const formData = new FormData();
       
       // Add files
       const fs = require('fs');
-      formData.append('sourceImage', fs.createReadStream(req.files.sourceImage[0].path));
-      formData.append('targetVideo', fs.createReadStream(req.files.targetVideo[0].path));
-      formData.append('jobId', jobId);
-      formData.append('consentConfirmed', req.body.consentConfirmed);
+      formData.append('source_image', fs.createReadStream(req.files.sourceImage[0].path));
+      formData.append('target_video', fs.createReadStream(req.files.targetVideo[0].path));
+      formData.append('mode', 'video');
       
       if (req.body.description) {
         formData.append('description', req.body.description);
+      } else {
+        formData.append('description', 'Default description');
       }
 
       // Call Python service
@@ -89,7 +91,7 @@ router.post(
 
       res.status(202).json({
         message: 'Video generation started',
-        jobId: jobId,
+        jobId: response.data.job_id,
         status: 'pending',
         estimatedTime: '2-3 minutes'
       });

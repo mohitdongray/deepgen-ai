@@ -4,7 +4,6 @@ import { ArrowLeft, Camera, Mic, Globe, Users, Film, Layers, Zap, Shield } from 
 import { addRevealClass, initScrollAnimations } from '../../styles/animations.js';
 import FeatureCard from '../../components/common/FeatureCard/FeatureCard';
 import { PageHeaderTitle } from '../../components/common/GradientTitles/GradientTitles';
-import '../../styles/themeShell.css';
 import './ExploreFeatures.css';
 
 const ExploreFeatures = () => {
@@ -32,22 +31,22 @@ const ExploreFeatures = () => {
       id: 'face-swap', // Added ID
       title: "AI Face Swap (Video & Image)",
       description: "Seamlessly replace faces in videos and images with advanced AI technology. Perfect for content creators, marketers, and filmmakers who need professional face swapping with natural results.",
-      icon: Camera,
-      mediaType: "icon"
+      media: "/faceswap.png",
+      mediaType: "image"
     },
     {
       id: 'voice-cloning', // Added ID
       title: "AI Voice Cloning Studio",
       description: "Create perfect AI voice clones from just a few minutes of audio. Generate custom voices for brand consistency, character voices, or personalized content.",
-      icon: Mic,
-      mediaType: "icon"
+      media: "/AI Voice Cloning.png",
+      mediaType: "image"
     },
     {
-      id: 'ai-dubbing', // Added ID
+      id: 'ai-dubbing',
       title: "Multi-language AI Dubbing",
       description: "Instantly dub videos into 175+ languages with perfect lip-sync and natural timing. Preserve original emotional tone and context while reaching global audiences.",
-      icon: Globe,
-      mediaType: "icon"
+      media: "/Voiceclone-Transcode.mp4",
+      mediaType: "video"
     },
     {
       id: 'avatar-video', // Added ID
@@ -67,20 +66,21 @@ const ExploreFeatures = () => {
       id: 'batch-video-production', // Added ID
       title: "Batch Video Production Automation",
       description: "Scale video production with automated batch processing. Generate multiple video variations simultaneously with different styles, languages, or formats.",
-      icon: Zap,
-      mediaType: "icon"
+      media: "/hero-shorter.mp4",
+      mediaType: "video"
     },
     {
       id: 'video-enhancement', // Added ID
       title: "AI Video Enhancement",
       description: "Enhance video quality with AI-powered upscaling, noise reduction, and color correction. Transform low-resolution footage into professional 4K content.",
-      icon: Film,
-      mediaType: "icon"
+      media: "/enhance.webm",
+      mediaType: "video"
     }
     // REMOVED: AI Content Generation card
   ];
 
   React.useEffect(() => {
+    window.scrollTo(0, 0);
     initScrollAnimations();
     if (heroRef.current) {
       const title = heroRef.current.querySelector('.page-title');
@@ -97,12 +97,12 @@ const ExploreFeatures = () => {
   }, []);
 
   const handleBackClick = () => {
-    navigate('/');
+    navigate('/', { replace: true });
   };
 
   const handleGetStarted = (featureId) => {
     localStorage.setItem('selectedFeature', featureId);
-    navigate('/upload?type=' + featureId);
+    navigate('/workspace?type=' + featureId);
   };
 
   return (

@@ -1,0 +1,314 @@
+/**
+ * Studio Page CSS — matches the site-wide dark glassmorphic design system
+ * Consistent with Create page, ExploreFeatures, and Home page aesthetics.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/* ═══════════════════════════════════════════════════════════
+   SHELL
+══════════════════════════════════════════════════════════════ */
+.studio-shell {
+  position: relative;
+  min-height: 100vh;
+  background: #030305;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  color: #fff;
+}
+
+.studio-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+/* Ambient orbs removed — switching to clean star background */
+
+/* ═══════════════════════════════════════════════════════════
+   BACK BUTTON
+══════════════════════════════════════════════════════════════ */
+.studio-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 9px 16px;
+  color: rgba(255,255,255,0.65);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  align-self: flex-start;
+}
+.studio-back:hover {
+  background: rgba(255,255,255,0.09);
+  border-color: rgba(255,255,255,0.2);
+  color: #fff;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════════════════════════ */
+.studio-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.studio-header--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.studio-header-icon {
+  width: 60px; height: 60px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+}
+
+.studio-header-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+
+.studio-title {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.025em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CATEGORY SWITCHER
+══════════════════════════════════════════════════════════════ */
+.studio-switcher {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.studio-switch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 9px 18px;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.studio-switch-btn:hover {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.8);
+}
+.studio-switch-btn--active {
+  background: rgba(255,255,255,0.06) !important;
+  font-weight: 600;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOOL CARDS GRID
+══════════════════════════════════════════════════════════════ */
+.studio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+/* ── Card ── */
+.studio-card {
+  position: relative;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+  padding: 26px 24px 22px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+  will-change: transform;
+  transition:
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+
+  /* Entrance */
+  opacity: 0;
+  transform: translateY(44px) scale(0.96);
+}
+
+.studio-card--visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 0.6s cubic-bezier(0.22,1,0.36,1),
+    transform 0.6s cubic-bezier(0.22,1,0.36,1),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+/* Stagger delays */
+.studio-card--stagger-1 { transition-delay: 0.04s; }
+.studio-card--stagger-2 { transition-delay: 0.10s; }
+.studio-card--stagger-3 { transition-delay: 0.16s; }
+.studio-card--stagger-4 { transition-delay: 0.22s; }
+.studio-card--stagger-5 { transition-delay: 0.28s; }
+.studio-card--stagger-6 { transition-delay: 0.34s; }
+
+.studio-card:hover {
+  border-color: var(--cat-accent, rgba(99,102,241,0.4));
+  box-shadow:
+    0 0 0 1px var(--cat-accent, rgba(99,102,241,0.2)),
+    0 16px 48px var(--cat-glow, rgba(99,102,241,0.2)),
+    0 6px 20px rgba(0,0,0,0.4);
+}
+
+/* Hover glow overlay */
+.studio-card-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at 50% 0%, var(--cat-glow, rgba(99,102,241,0.12)) 0%, transparent 65%);
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.studio-card:hover .studio-card-glow { opacity: 1; }
+
+/* ── Badge ── */
+.studio-card-badge {
+  position: absolute;
+  top: 18px; right: 18px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 100px;
+  border: 1px solid;
+}
+
+/* ── Icon ── */
+.studio-card-icon {
+  width: 48px; height: 48px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+.studio-card:hover .studio-card-icon {
+  transform: scale(1.1) rotate(-4deg);
+}
+
+/* ── Text ── */
+.studio-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+
+.studio-card-desc {
+  font-size: 0.84rem;
+  color: rgba(255,255,255,0.48);
+  line-height: 1.65;
+  margin: 0;
+  flex: 1;
+}
+
+/* ── Tags ── */
+.studio-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.studio-card-tag {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 100px;
+  padding: 2px 9px;
+  letter-spacing: 0.02em;
+}
+
+/* ── Footer ── */
+.studio-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  margin-top: auto;
+}
+
+.studio-card-time {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.3);
+  font-weight: 500;
+}
+.studio-card-time svg { opacity: 0.7; }
+
+.studio-card-cta {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  transition: color 0.2s ease, gap 0.2s ease;
+}
+.studio-card:hover .studio-card-cta {
+  color: var(--cat-accent, #818cf8);
+  gap: 6px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════════════════════════ */
+@media (max-width: 960px) {
+  .studio-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .studio-inner { padding: 24px 16px 80px; gap: 24px; }
+  .studio-grid { grid-template-columns: 1fr; }
+  .studio-title { font-size: 1.3rem; }
+  .studio-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+}

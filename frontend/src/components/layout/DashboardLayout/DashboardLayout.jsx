@@ -30,7 +30,7 @@ const DashboardLayout = ({ children }) => {
   const location = useLocation();
   
   // Routes where AI prompt bar should appear
-  const creationRoutes = ['/upload', '/video', '/image', '/voice', '/generate'];
+  const creationRoutes = ['/workspace', '/video', '/image', '/voice', '/generate'];
   const showPromptBar = creationRoutes.includes(location.pathname);
 
   return (

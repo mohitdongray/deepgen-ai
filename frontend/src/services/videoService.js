@@ -12,31 +12,53 @@
 
 import api from './api';
 
-export const initiateVideoGeneration = async (formData) => {
-  const response = await api.post('/generate-video', formData, {
+
+// 🚀 Generate content with AI — calls /generate (FormData) then polls /status
+export const generateVideo = async (prompt, mode = "image") => {
+  // Step 1: Submit generation request with FormData
+  const formData = new FormData();
+  formData.append("description", prompt);
+  formData.append("mode", mode);
+
+  const submitRes = await api.post("/generate", formData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
     },
-    timeout: 60000,
-  });
-  return response.data;
-};
-
-export const getVideoStatus = async (jobId) => {
-  const response = await api.get(`/video-status/${jobId}`);
-  return response.data;
-};
-
-export const fetchVideoResult = async (jobId) => {
-  const response = await api.get(`/video-result/${jobId}`);
-  return response.data;
-};
-
-// 🚀 NEW: Generate content with AI
-export const generateVideo = async (prompt) => {
-  const response = await api.post("/generate", {
-    prompt: prompt
   });
 
-  return response.data;
+  const { job_id } = submitRes.data;
+  if (!job_id) {
+    throw new Error("No job_id returned from /generate");
+  }
+
+  // Step 2: Poll /status/{job_id} until completed or failed
+  const maxRetries = 60; // 60 x 2s = 2 minutes max
+  const pollInterval = 2000; // 2 seconds
+
+  for (let i = 0; i < maxRetries; i++) {
+    await new Promise((resolve) => setTimeout(resolve, pollInterval));
+
+    const statusRes = await api.get(`/status/${job_id}`);
+    const job = statusRes.data;
+
+    if (job.status === "completed") {
+      // Return in the shape the UI expects
+      return {
+        status: "success",
+        image_url: job.image_url || job.video_url,
+        video_url: job.video_url,
+        provider: job.provider || "huggingface",
+        request_id: job_id,
+        job_id,
+      };
+    }
+
+    if (job.status === "failed") {
+      throw new Error(job.error || "Generation failed");
+    }
+
+    // Still processing — keep polling
+  }
+
+  throw new Error("Generation timed out after 2 minutes");
 };

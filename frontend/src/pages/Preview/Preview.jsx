@@ -33,7 +33,7 @@ const Preview = () => {
 
   return (
     <div className="preview-page">
-      <button className="back-btn" onClick={() => navigate('/upload')}>
+      <button className="back-btn" onClick={() => navigate('/workspace')}>
         <ArrowLeft size={18} />
         Create Another
       </button>
@@ -57,7 +57,7 @@ const Preview = () => {
           <AlertCircle size={48} className="error-icon" />
           <h2>Generation Failed</h2>
           <p>{error || 'An unexpected error occurred.'}</p>
-          <button className="retry-btn" onClick={() => navigate('/upload')}>
+          <button className="retry-btn" onClick={() => navigate('/workspace')}>
             <RefreshCw size={18} />
             Try Again
           </button>

@@ -23,13 +23,21 @@ const VideoPreview = ({ media, mediaType, icon: Icon }) => {
           playsInline
           className="feature-video"
         />
+      ) : mediaType === 'image' && media ? (
+        <img
+          src={media}
+          alt="Feature preview"
+          className="feature-image"
+          style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '12px' }}
+          onError={(e) => { e.target.style.display = 'none'; }}
+        />
       ) : Icon ? (
         <div className="feature-placeholder">
           <Icon size={48} />
         </div>
       ) : (
         <div className="feature-placeholder">
-          <Zap size={48} />
+          <Camera size={48} />
         </div>
       )}
     </div>
