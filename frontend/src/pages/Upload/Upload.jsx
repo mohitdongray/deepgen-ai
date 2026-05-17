@@ -237,7 +237,7 @@ const UploadPage = () => {
         apiFormData.append("consent_confirmed", "true");
         apiFormData.append("job_id", Date.now().toString());
 
-        const res = await fetch("http://localhost:5000/api/generate", {
+        const res = await fetch(`${process.env.REACT_APP_GATEWAY_URL || 'http://localhost:5000'}/api/generate`, {
           method: "POST",
           body: apiFormData
         });
@@ -250,7 +250,7 @@ const UploadPage = () => {
 
         const pollInterval = setInterval(async () => {
           try {
-            const statusRes = await fetch(`http://localhost:5000/api/status/${jobId}`);
+            const statusRes = await fetch(`${process.env.REACT_APP_GATEWAY_URL || 'http://localhost:5000'}/api/status/${jobId}`);
             const statusData = await statusRes.json();
 
             if (statusData.status === "completed") {
@@ -265,13 +265,13 @@ const UploadPage = () => {
               if (simpleModeType === 'image') {
                 const finalUrl = (imageUrl || videoUrl);
                 const fullUrl = (finalUrl && finalUrl.startsWith('/'))
-                  ? `http://localhost:8000${finalUrl}`
+                  ? `${process.env.REACT_APP_AI_URL || 'http://localhost:8000'}${finalUrl}`
                   : finalUrl;
                 setResultImageUrl(fullUrl);
               } else {
                 if (videoUrl) {
                   const fullUrl = videoUrl.startsWith('/')
-                    ? `http://localhost:8000${videoUrl}`
+                    ? `${process.env.REACT_APP_AI_URL || 'http://localhost:8000'}${videoUrl}`
                     : videoUrl;
                   setResultVideoUrl(fullUrl);
                 } else {
@@ -309,7 +309,7 @@ const UploadPage = () => {
         const modeMap = { 'text-to-image': 'image', 'style-transfer': 'ai-content-generation' };
         apiFormData.append("mode", modeMap[activeType] || activeType || "video");
 
-        const res = await fetch("http://localhost:5000/api/generate", {
+        const res = await fetch(`${process.env.REACT_APP_GATEWAY_URL || 'http://localhost:5000'}/api/generate`, {
           method: "POST",
           body: apiFormData
         });
@@ -322,7 +322,7 @@ const UploadPage = () => {
 
         const pollInterval = setInterval(async () => {
           try {
-            const statusRes = await fetch(`http://localhost:5000/api/status/${jobId}`);
+            const statusRes = await fetch(`${process.env.REACT_APP_GATEWAY_URL || 'http://localhost:5000'}/api/status/${jobId}`);
             const statusData = await statusRes.json();
 
             if (statusData.status === "completed") {
@@ -333,14 +333,14 @@ const UploadPage = () => {
               // Read from top-level statusData (backend returns flat structure)
               if (statusData.image_url) {
                 const imgUrl = statusData.image_url.startsWith('/')
-                  ? `http://localhost:8000${statusData.image_url}`
+                  ? `${process.env.REACT_APP_AI_URL || 'http://localhost:8000'}${statusData.image_url}`
                   : statusData.image_url;
                 setResultImageUrl(imgUrl);
               }
 
               if (statusData.video_url) {
                 const videoUrl = statusData.video_url.startsWith('/')
-                  ? `http://localhost:8000${statusData.video_url}`
+                  ? `${process.env.REACT_APP_AI_URL || 'http://localhost:8000'}${statusData.video_url}`
                   : statusData.video_url;
                 setResultVideoUrl(videoUrl);
               } else if (activeType !== 'text-to-image' && activeType !== 'ai-content-generation') {

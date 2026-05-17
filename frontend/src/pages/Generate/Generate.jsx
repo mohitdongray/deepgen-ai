@@ -38,7 +38,7 @@ function Generate() {
     }
     // If it's a local path like /outputs/xxx.png, prepend the backend base URL
     if (url.startsWith("/")) {
-      return `http://localhost:8000${url}`;
+      return `${process.env.REACT_APP_AI_URL || 'http://localhost:8000'}${url}`;
     }
     return url;
   };
