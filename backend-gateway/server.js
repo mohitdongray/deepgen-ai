@@ -34,7 +34,6 @@ app.post("/generate", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Gateway running on port ${PORT}`);
+app.listen(process.env.PORT || 10000, () => {
+  console.log("Gateway running");
 });
