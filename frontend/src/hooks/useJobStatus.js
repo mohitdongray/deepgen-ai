@@ -18,7 +18,7 @@ export const useJobStatus = (jobId) => {
     if (!jobId) return;
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/status/${jobId}`);
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/status/${jobId}`);
       const response = await res.json();
       setStatus(response.status);
       setPollCount((prev) => prev + 1);
