@@ -237,7 +237,7 @@ const UploadPage = () => {
         apiFormData.append("consent_confirmed", "true");
         apiFormData.append("job_id", Date.now().toString());
 
-        const res = await fetch(`${process.env.REACT_APP_GATEWAY_URL || 'http://localhost:5000'}/api/generate`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/generate`, {
           method: "POST",
           body: apiFormData
         });
@@ -250,7 +250,7 @@ const UploadPage = () => {
 
         const pollInterval = setInterval(async () => {
           try {
-            const statusRes = await fetch(`${process.env.REACT_APP_GATEWAY_URL || 'http://localhost:5000'}/api/status/${jobId}`);
+            const statusRes = await fetch(`${import.meta.env.VITE_API_URL}/status/${jobId}`);
             const statusData = await statusRes.json();
 
             if (statusData.status === "completed") {
@@ -309,7 +309,7 @@ const UploadPage = () => {
         const modeMap = { 'text-to-image': 'image', 'style-transfer': 'ai-content-generation' };
         apiFormData.append("mode", modeMap[activeType] || activeType || "video");
 
-        const res = await fetch(`${process.env.REACT_APP_GATEWAY_URL || 'http://localhost:5000'}/api/generate`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/generate`, {
           method: "POST",
           body: apiFormData
         });
@@ -322,7 +322,7 @@ const UploadPage = () => {
 
         const pollInterval = setInterval(async () => {
           try {
-            const statusRes = await fetch(`${process.env.REACT_APP_GATEWAY_URL || 'http://localhost:5000'}/api/status/${jobId}`);
+            const statusRes = await fetch(`${import.meta.env.VITE_API_URL}/status/${jobId}`);
             const statusData = await statusRes.json();
 
             if (statusData.status === "completed") {
