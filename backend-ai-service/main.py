@@ -43,6 +43,14 @@ print(f"[STARTUP] NVIDIA key present:      {bool(os.getenv('NVIDIA_API_KEY'))}")
 
 app = FastAPI()
 
+@app.get("/")
+def root():
+    return {"status": "DeepGen AI is running", "service": "DeepGenAI Backend"}
+
+@app.get("/health")
+def health():
+    return {"status": "healthy", "service": "DeepGenAI", "version": "1.0.0"}
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -76,21 +84,7 @@ provider_manager = AIProviderManager()
 # BASIC ROUTES
 # =========================
 
-@app.get("/")
-async def root():
-    return {"status": "running"}
 
-@app.get("/health")
-async def health():
-    return {
-        "status": "ok",
-        "providers": {
-            "huggingface": bool(os.getenv("HUGGINGFACE_API_KEY")),
-            "deepai":      bool(os.getenv("DEEPAI_API_KEY")),
-            "nvidia":      bool(os.getenv("NVIDIA_API_KEY")),
-            "heygen":      bool(os.getenv("HEYGEN_API_KEY")),
-        }
-    }
 
 # =========================
 # REQUEST MODELS
