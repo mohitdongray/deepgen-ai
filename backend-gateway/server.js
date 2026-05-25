@@ -18,8 +18,15 @@ const app = express();
 
 app.use(
   cors({
-    origin: [FRONTEND_URL, "http://localhost:3000", "http://127.0.0.1:3000"],
+    origin: [
+      FRONTEND_URL,
+      "https://deepgen-ai-1.onrender.com",   // your frontend domain
+      "http://localhost:3000",
+      "http://localhost:5000",
+    ],
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 app.use(express.json({ limit: "10mb" }));
