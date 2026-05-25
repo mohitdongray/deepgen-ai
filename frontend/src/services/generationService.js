@@ -8,7 +8,9 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 /** Gateway base URL (supports CRA and Vite env names). */
 export function getApiBase() {
   return (
+    process.env.REACT_APP_GATEWAY_URL ||
     process.env.REACT_APP_API_URL ||
+    process.env.VITE_API_URL ||
     process.env.VITE_BACKEND_URL ||
     process.env.REACT_APP_API_BASE_URL?.replace(/\/api\/?$/, "") ||
     "http://localhost:5000"

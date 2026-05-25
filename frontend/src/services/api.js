@@ -12,7 +12,9 @@
 import axios from 'axios';
 
 const API_BASE_URL =
+  process.env.REACT_APP_GATEWAY_URL ||
   process.env.REACT_APP_API_URL ||
+  process.env.VITE_API_URL ||
   process.env.VITE_BACKEND_URL ||
   process.env.REACT_APP_API_BASE_URL?.replace(/\/api\/?$/, "") ||
   "http://localhost:5000";
