@@ -15,6 +15,7 @@ import Loader from '../../components/common/Loader/Loader';
 import AIGeneratedBadge from '../../components/features/AIGeneratedBadge/AIGeneratedBadge';
 import GenerationProgress from '../../components/features/GenerationProgress/GenerationProgress';
 import { useJobStatus } from '../../hooks/useJobStatus';
+import { resolveMediaUrl } from '../../services/generationService';
 import './Preview.css';
 
 const Preview = () => {
@@ -22,10 +23,12 @@ const Preview = () => {
   const navigate = useNavigate();
   const { status, result, error, pollCount } = useJobStatus(jobId);
 
+  const videoSrc = resolveMediaUrl(result?.video_url || result?.videoUrl);
+
   const handleDownload = () => {
-    if (result?.videoUrl) {
+    if (videoSrc) {
       const link = document.createElement('a');
-      link.href = result.videoUrl;
+      link.href = videoSrc;
       link.download = `ai-generated-${jobId}.mp4`;
       link.click();
     }
@@ -68,9 +71,8 @@ const Preview = () => {
             <AIGeneratedBadge />
             <video 
               controls 
-              src={result?.videoUrl} 
+              src={videoSrc} 
               className="result-video"
-              poster="/video-placeholder.jpg"
             />
           </div>
 

@@ -1,15 +1,12 @@
 /**
- * Custom Hook: useJobStatus
- * 
- * Polls for video generation job status.
- * Handles the async nature of AI video generation which can take minutes.
- * Implements exponential backoff to reduce server load.
+ * Polls async generation job status via the gateway.
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { getApiBase, resolveMediaUrl } from '../services/generationService';
 
 export const useJobStatus = (jobId) => {
-  const [status, setStatus] = useState('pending'); // pending, processing, completed, failed
+  const [status, setStatus] = useState('pending');
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [pollCount, setPollCount] = useState(0);
@@ -18,18 +15,28 @@ export const useJobStatus = (jobId) => {
     if (!jobId) return;
 
     try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/status/${jobId}`);
+      const res = await fetch(`${getApiBase()}/status/${jobId}`);
+      if (!res.ok) {
+        throw new Error(`Status check failed (${res.status})`);
+      }
+
       const response = await res.json();
       setStatus(response.status);
       setPollCount((prev) => prev + 1);
 
       if (response.status === 'completed') {
-        setResult(response);
+        setResult({
+          ...response,
+          video_url: resolveMediaUrl(response.video_url),
+          image_url: resolveMediaUrl(response.image_url),
+          videoUrl: resolveMediaUrl(response.video_url),
+          imageUrl: resolveMediaUrl(response.image_url),
+        });
       } else if (response.status === 'failed') {
-        setError(response.error || 'Video generation failed.');
+        setError(response.error || 'Generation failed.');
       }
     } catch (err) {
-      setError('Failed to check job status.');
+      setError(err.message || 'Failed to check job status.');
     }
   }, [jobId]);
 
@@ -38,13 +45,9 @@ export const useJobStatus = (jobId) => {
       return;
     }
 
-    // Initial check
     checkStatus();
 
-    // Polling with exponential backoff
-    // Start with 2s, max 30s intervals
     const interval = Math.min(2000 * Math.pow(1.5, Math.min(pollCount, 10)), 30000);
-    
     const timer = setInterval(checkStatus, interval);
     return () => clearInterval(timer);
   }, [jobId, status, checkStatus, pollCount]);

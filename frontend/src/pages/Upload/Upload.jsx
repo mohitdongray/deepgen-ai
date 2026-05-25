@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
+import { runJsonGeneration, runMultipartGeneration } from '../../services/generationService';
 import {
   ArrowLeft, ArrowRight, Upload as UploadIcon,
   Type, Image as ImageIcon, Video, Mic,
@@ -226,158 +227,61 @@ const UploadPage = () => {
     setShowVideo(false);
     setPollingStatus('Initializing...');
 
+    const onProgress = (job) => {
+      if (job.status === 'processing') setPollingStatus('Processing with AI...');
+      else if (job.status === 'pending') setPollingStatus('Queued...');
+      else setPollingStatus(`Status: ${job.status}`);
+    };
+
     try {
       if (isSimpleMode) {
-        // Simplified mode API call
-        const description = simpleModeType === 'image' ? formData.script : formData.script;
+        const result = await runJsonGeneration(
+          { prompt: formData.script, mode: simpleModeType },
+          { onProgress }
+        );
 
-        const apiFormData = new FormData();
-        apiFormData.append("description", description);
-        apiFormData.append("mode", simpleModeType);
-        apiFormData.append("consent_confirmed", "true");
-        apiFormData.append("job_id", Date.now().toString());
-
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/generate`, {
-          method: "POST",
-          body: apiFormData
-        });
-        const data = await res.json();
-
-        if (!data.job_id) throw new Error("Failed to start job");
-        const jobId = data.job_id;
-
-        setPollingStatus('Processing...');
-
-        const pollInterval = setInterval(async () => {
-          try {
-            const statusRes = await fetch(`${process.env.REACT_APP_API_URL}/status/${jobId}`);
-            const statusData = await statusRes.json();
-
-            if (statusData.status === "completed") {
-              clearInterval(pollInterval);
-              setIsGenerating(false);
-              setPollingStatus('');
-
-              // Read from top-level statusData (backend returns flat structure)
-              const videoUrl = statusData.video_url;
-              const imageUrl = statusData.image_url;
-
-              if (simpleModeType === 'image') {
-                const finalUrl = (imageUrl || videoUrl);
-                const fullUrl = (finalUrl && finalUrl.startsWith('/'))
-                  ? `${process.env.REACT_APP_AI_URL || 'http://localhost:8000'}${finalUrl}`
-                  : finalUrl;
-                setResultImageUrl(fullUrl);
-              } else {
-                if (videoUrl) {
-                  const fullUrl = videoUrl.startsWith('/')
-                    ? `${process.env.REACT_APP_AI_URL || 'http://localhost:8000'}${videoUrl}`
-                    : videoUrl;
-                  setResultVideoUrl(fullUrl);
-                } else {
-                  setResultVideoUrl("https://www.w3schools.com/html/mov_bbb.mp4");
-                }
-              }
-            } else if (statusData.status === "failed") {
-              clearInterval(pollInterval);
-              setIsGenerating(false);
-              setPollingStatus('');
-              setError(`Generation failed: ${statusData.error || 'Unknown error'}`);
-            } else if (statusData.error) {
-              clearInterval(pollInterval);
-              setIsGenerating(false);
-              setPollingStatus('');
-              setError(`Error checking status: ${statusData.error}`);
-            }
-          } catch (err) {
-            console.error("Polling error", err);
+        if (simpleModeType === 'image') {
+          setResultImageUrl(result.image_url);
+          setShowVideo(false);
+        } else {
+          if (!result.video_url) {
+            throw new Error('Video generation completed but no video URL was returned');
           }
-        }, 3000);
-
+          setResultVideoUrl(result.video_url);
+          setShowVideo(true);
+        }
       } else {
-        // Original complex mode API call
         const apiFormData = new FormData();
-        if (formData.image) apiFormData.append("source_image", formData.image);
+        if (formData.image) apiFormData.append('source_image', formData.image);
 
         const targetMedia = formData.video || formData.targetImage;
-        if (targetMedia) apiFormData.append("target_video", targetMedia);
+        if (targetMedia) apiFormData.append('target_video', targetMedia);
 
-        apiFormData.append("job_id", Date.now().toString());
-        apiFormData.append("consent_confirmed", "true");
-        apiFormData.append("description", formData.script || formData.prompt || "AI video test");
-        // Map frontend types to backend mode strings
+        apiFormData.append('consent_confirmed', 'true');
+        apiFormData.append('description', formData.script || formData.prompt || 'AI generation');
         const modeMap = { 'text-to-image': 'image', 'style-transfer': 'ai-content-generation' };
-        apiFormData.append("mode", modeMap[activeType] || activeType || "video");
+        apiFormData.append('mode', modeMap[activeType] || activeType || 'video');
 
-        const res = await fetch(`${process.env.REACT_APP_API_URL}/generate`, {
-          method: "POST",
-          body: apiFormData
-        });
-        const data = await res.json();
+        const result = await runMultipartGeneration(apiFormData, { onProgress });
 
-        if (!data.job_id) throw new Error("Failed to start job");
-        const jobId = data.job_id;
-
-        setPollingStatus('Processing...');
-
-        const pollInterval = setInterval(async () => {
-          try {
-            const statusRes = await fetch(`${process.env.REACT_APP_API_URL}/status/${jobId}`);
-            const statusData = await statusRes.json();
-
-            if (statusData.status === "completed") {
-              clearInterval(pollInterval);
-              setIsGenerating(false);
-              setPollingStatus('');
-
-              // Read from top-level statusData (backend returns flat structure)
-              if (statusData.image_url) {
-                const imgUrl = statusData.image_url.startsWith('/')
-                  ? `${process.env.REACT_APP_AI_URL || 'http://localhost:8000'}${statusData.image_url}`
-                  : statusData.image_url;
-                setResultImageUrl(imgUrl);
-              }
-
-              if (statusData.video_url) {
-                const videoUrl = statusData.video_url.startsWith('/')
-                  ? `${process.env.REACT_APP_AI_URL || 'http://localhost:8000'}${statusData.video_url}`
-                  : statusData.video_url;
-                setResultVideoUrl(videoUrl);
-              } else if (activeType !== 'text-to-image' && activeType !== 'ai-content-generation') {
-                // Only use video fallback if it's supposed to be a video task
-                setResultVideoUrl("https://www.w3schools.com/html/mov_bbb.mp4");
-              }
-
-              // Only do the video reveal trick if this is NOT an image-only generation
-              if (activeType !== 'text-to-image') {
-                setTimeout(() => {
-                  setShowVideo(true);
-                }, 4000);
-              } else {
-                // If it's just an image, ensure showVideo is false so the image stays visible
-                setShowVideo(false);
-              }
-
-            } else if (statusData.status === "failed") {
-              clearInterval(pollInterval);
-              setIsGenerating(false);
-              setPollingStatus('');
-              setError(`Generation failed: ${statusData.error || 'Unknown error'}`);
-            } else if (statusData.error) {
-              clearInterval(pollInterval);
-              setIsGenerating(false);
-              setPollingStatus('');
-              setError(`Error checking status: ${statusData.error}`);
-            }
-          } catch (err) {
-            console.error("Polling error", err);
+        if (result.image_url) {
+          setResultImageUrl(result.image_url);
+        }
+        if (result.video_url) {
+          setResultVideoUrl(result.video_url);
+          if (activeType !== 'text-to-image' && activeType !== 'ai-content-generation') {
+            setTimeout(() => setShowVideo(true), 500);
           }
-        }, 3000);
+        } else if (activeType !== 'text-to-image' && activeType !== 'ai-content-generation') {
+          throw new Error('Video generation completed but no video URL was returned');
+        }
       }
 
+      setIsGenerating(false);
+      setPollingStatus('');
     } catch (err) {
-      console.error(err);
-      setError("Failed to start generation");
+      console.error('[Upload] generation error:', err);
+      setError(err.message || 'Failed to start generation');
       setIsGenerating(false);
       setPollingStatus('');
     }

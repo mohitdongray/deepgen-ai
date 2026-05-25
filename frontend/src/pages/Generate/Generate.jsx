@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { generateVideo } from "../../services/videoService";
+import { resolveMediaUrl } from "../../services/generationService";
 
 function Generate() {
   const [prompt, setPrompt] = useState("");
@@ -29,19 +30,7 @@ function Generate() {
     }
   };
 
-  // Helper: build full URL for locally saved images
-  const getImageUrl = (url) => {
-    if (!url) return null;
-    // If it's already a full URL (http/https/data) use it as-is
-    if (url.startsWith("http") || url.startsWith("data:")) {
-      return url;
-    }
-    // If it's a local path like /outputs/xxx.png, prepend the backend base URL
-    if (url.startsWith("/")) {
-      return `${process.env.REACT_APP_AI_URL || 'http://localhost:8000'}${url}`;
-    }
-    return url;
-  };
+  const getImageUrl = (url) => resolveMediaUrl(url);
 
   return (
     <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto", color: "#e2e8f0" }}>

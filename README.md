@@ -187,35 +187,52 @@ major project/
 │   ├── controllers/
 │   │   └── generateController.js    # Generation & status logic
 │   ├── middleware/
-│   │   ├── rateLimiter.js           # Rate limiting (5/hour)
 │   │   ├── requestValidator.js      # File & consent validation
 │   │   ├── errorHandler.js          # Global error handler
-│   │   └── security.js              # Custom security headers
-│   ├── models/
-│   │   └── Generation.js            # Mongoose schema
+│   │   └── security.js              # Custom security headers                       
 │   └── routes/
 │       ├── videoRoutes.js           # Video generation routes
 │       └── generateRoute.js         # Generate & status routes
 │
 ├── backend-ai-service/              # Python FastAPI AI Service (Port 8000)
 │   ├── main.py                      # FastAPI application entry point
-│   ├── orchestrator.py              # Multi-provider AI orchestrator
+│   ├── db.py                        # MongoDB database async client (motor-based)
 │   ├── requirements.txt             # Python dependencies
-│   ├── ai/
-│   │   ├── ai_provider.py           # AIProviderManager (routes mode → provider)
-│   │   ├── heygen_provider.py       # HeyGen API integration
-│   │   ├── huggingface_provider.py  # HuggingFace Stable Diffusion
-│   │   ├── deepai_provider.py       # DeepAI text-to-image
-│   │   ├── gemini_provider.py       # Google Gemini integration
-│   │   └── local_model.py           # Local model support
-│   ├── app/
-│   │   └── core/
-│   │       └── logging.py           # Logging configuration
-│   └── outputs/                     # Generated media storage
-│
+│   ├── app/                         # Modern async app package
+│   │   ├── config.py                # Environment configurations and Settings
+│   │   ├── exceptions.py            # Unified application exceptions
+│   │   ├── dependencies.py          # FastAPI dependencies
+│   │   ├── logging_config.py        # System logging setup
+│   │   ├── core/
+│   │   │   ├── http.py              # Shared lifecycle-managed async HTTP client
+│   │   │   └── retry.py             # Network request retry handler
+│   │   ├── jobs/
+│   │   │   ├── models.py            # Job schema / validation models
+│   │   │   └── store.py             # Job metadata store manager
+│   │   ├── services/
+│   │   │   ├── generation.py        # Orchestrates the media generation flow
+│   │   │   └── media.py             # Downloader & storage manager for media files
+│   │   ├── providers/               # Multi-provider integrations with fallbacks
+│   │   │   ├── base.py              # Unified provider contract (BaseProvider)
+│   │   │   ├── registry.py          # Provider loading, execution, & fallback chain
+│   │   │   ├── flux.py              # Black Forest Labs Flux provider
+│   │   │   ├── qwen.py              # NVIDIA NIM Qwen-image provider
+│   │   │   ├── heygen.py            # HeyGen avatar video provider
+│   │   │   ├── tavus.py             # Tavus video provider
+│   │   │   ├── deepai.py            # DeepAI image generator provider
+│   │   │   ├── huggingface.py       # HuggingFace Stable Diffusion XL provider
+│   │   │   ├── pollinations.py      # Pollinations image provider (no key required)
+│   │   │   ├── fallback.py          # Generic offline/sample generator fallback
+│   │   │   └── status.py            # Helper for checking provider status
+│   │   └── api/
+│   │       ├── router.py            # FastAPI main router grouping
+│   │       ├── schemas.py           # API request and response schemas
+│   │       └── routes/
+│   │           ├── generate.py      # Generation router endpoints
+│   │           └── health.py        # Core service health checks
+│   └── outputs/                     # Generated media local storage
 ├── ARCHITECTURE.md                  # Detailed architecture documentation
-├── project-structure.js             # Auto-generated structure reference
-└── project-submission/              # Submission package
+└── render.yaml                      # Render deployment configuration
 ```
 
 ---
@@ -236,12 +253,22 @@ AI_SERVICE_URL=http://localhost:8000
 ### `backend-ai-service/.env`
 
 ```env
+# Database Settings
+MONGO_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/ai-video-db
+
+# Core Service Settings
+DEBUG=false
+PORT=8000
+HOST=0.0.0.0
+
+# API Keys (Provide at least one)
+QWEN_API_KEY=your_qwen_key
+FLUX_API_KEY=your_flux_key
+TAVUS_API_KEY=your_tavus_key
+NVIDIA_API_KEY=your_nvidia_key
 HEYGEN_API_KEY=your_heygen_key
 DEEPAI_API_KEY=your_deepai_key
 HUGGINGFACE_API_KEY=your_huggingface_key
-GEMINI_API_KEY=your_gemini_key
-REPLICATE_API_TOKEN=your_replicate_key
-TAVUS_API_KEY=your_tavus_key
 ```
 
 ---
@@ -262,11 +289,11 @@ TAVUS_API_KEY=your_tavus_key
 
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | `/health` | Health check |
-| POST | `/generate` | Start generation job |
-| POST | `/generate-json` | Start job (JSON body) |
-| GET | `/status/:jobId` | Get job status |
-| GET | `/metrics` | Service metrics |
+| GET | `/` | Service root and version check |
+| GET | `/health` | Health check and provider connectivity status |
+| POST | `/generate` | Start generation job (multipart/form-data) |
+| POST | `/generate-json` | Start generation job (JSON payload) |
+| GET | `/status/:jobId` | Retrieve job status, progress, and result |
 
 ---
 
