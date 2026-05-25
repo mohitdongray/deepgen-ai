@@ -16,19 +16,16 @@ const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
 
 const app = express();
 
+// ✅ CORRECT CORS – allow specific frontend origin
 app.use(
   cors({
-    origin: [
-      FRONTEND_URL,
-      "https://deepgen-ai-1.onrender.com",   // your frontend domain
-      "http://localhost:3000",
-      "http://localhost:5000",
-    ],
+    origin: [FRONTEND_URL, "https://deepgen-ai-1.onrender.com", "http://localhost:3000"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use(express.json({ limit: "10mb" }));
 
 app.get("/", (_req, res) => {

@@ -51,7 +51,11 @@ async def shutdown():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://deepgen-gateway.onrender.com", "http://localhost:5000"],
+    allow_origins=[
+        "https://deepgen-gateway.onrender.com",
+        "http://localhost:5000",
+        "https://deepgen-ai-1.onrender.com"   # optional, for direct frontend calls
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -120,7 +124,13 @@ async def process_job(job_id: str, prompt: str, mode: str):
     print(f"[PROCESS:{job_id}] Starting — mode={mode}")
     try:
         await update_job(job_id, status="processing", progress=10)
-        result, provider_name = await registry.generate(mode, prompt)
+        try:
+            result, provider_name = await asyncio.wait_for(
+                registry.generate(mode, prompt),
+                timeout=120.0
+            )
+        except asyncio.TimeoutError:
+            raise Exception("Provider generation timed out after 120 seconds")
         media_url = result.image_url or result.video_url or result.output
         if not media_url:
             raise RuntimeError("Provider returned no media URL")
