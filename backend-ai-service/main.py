@@ -27,22 +27,36 @@ from app.core.http import HttpClient
 from app.providers.registry import ProviderRegistry
 from db import create_job, update_job, get_job, test_connection
 
-print("[STARTUP] main.py loaded (async provider registry)")
+print("[STARTUP] main.py loaded (awaiting startup event for HTTP client init)")
 print(f"[STARTUP] QWEN_API_KEY    : {bool(os.getenv('QWEN_API_KEY'))}")
 print(f"[STARTUP] FLUX_API_KEY    : {bool(os.getenv('FLUX_API_KEY'))}")
 print(f"[STARTUP] TAVUS_API_KEY   : {bool(os.getenv('TAVUS_API_KEY'))}")
 print(f"[STARTUP] TAVUS_REPLICA_ID: {bool(os.getenv('TAVUS_REPLICA_ID'))}")
 
-settings = get_settings()
-http_client = HttpClient(settings)
-registry = ProviderRegistry(settings, http_client)
+# ✅ FIX #1: Don't initialize at module level
+# These will be initialized in startup() event
+settings = None
+http_client = None
+registry = None
 
 app = FastAPI(title="DeepGen AI Service", version="2.1.0")
 
 @app.on_event("startup")
 async def startup():
+    global settings, http_client, registry
+    
+    # Initialize settings
+    settings = get_settings()
+    print(f"[STARTUP] Settings loaded")
+    
+    # Initialize HTTP client and start it
+    http_client = HttpClient(settings)
     await http_client.start()
     print("✅ HTTP client started")
+    
+    # Initialize registry after HTTP client is ready
+    registry = ProviderRegistry(settings, http_client)
+    print("✅ Provider registry initialized")
 
 @app.on_event("shutdown")
 async def shutdown():
@@ -135,6 +149,9 @@ async def process_job(job_id: str, prompt: str, mode: str):
         if not media_url:
             raise RuntimeError("Provider returned no media URL")
         print(f"[PROCESS:{job_id}] provider={provider_name}  url={media_url[:80]}")
+
+        # Pollinations will go through the normal download path so files are saved to outputs/
+
         saved_path = None
         try:
             if media_url.startswith("data:image"):
@@ -165,7 +182,15 @@ async def process_job(job_id: str, prompt: str, mode: str):
             "video_url": None if is_image else saved_path,
             "provider":  provider_name,
         }
-        await update_job(job_id, status="completed", progress=100, provider=provider_name, result=result_doc, image_url=result_doc["image_url"], video_url=result_doc["video_url"])
+        await update_job(
+            job_id,
+            status="completed",
+            progress=100,
+            provider=provider_name,
+            result=result_doc,
+            image_url=result_doc["image_url"],
+            video_url=result_doc["video_url"],
+        )
     except Exception as e:
         print(f"[PROCESS:{job_id}] ❌ {e}")
         await update_job(job_id, status="failed", progress=0, error=str(e))
