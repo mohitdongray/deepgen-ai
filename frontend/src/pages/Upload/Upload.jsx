@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { runJsonGeneration, runMultipartGeneration } from '../../services/generationService';
@@ -146,6 +146,7 @@ const UploadPage = () => {
   const [cyclingTextIndex, setCyclingTextIndex] = useState(0);
   const [isSimpleMode, setIsSimpleMode] = useState(false);
   const [simpleModeType, setSimpleModeType] = useState('image');
+  const resultRef = useRef(null);
 
   // Reset form when switching types
   useEffect(() => {
@@ -259,6 +260,13 @@ const UploadPage = () => {
     setImageLoaded(false);
     setPollCount(prev => prev + 1);
     setPollingStatus('Starting...');
+
+    // Scroll to result area
+    setTimeout(() => {
+      if (resultRef.current) {
+        resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
 
     const onProgress = (job) => {
       if (job.status === 'pending') setPollingStatus('Starting...');
@@ -414,7 +422,7 @@ const UploadPage = () => {
           </button>
 
           {isGenerating && !resultImageUrl && !showVideo && (
-            <div className="skeleton-preview">
+            <div className="skeleton-preview" ref={resultRef}>
               <div className="skeleton-image" />
               <p className="skeleton-text">{getCyclingText()}</p>
               {pollCount === 1 && (
@@ -700,7 +708,7 @@ const UploadPage = () => {
         </button>
 
         {isGenerating && !resultImageUrl && !showVideo && (
-          <div className="skeleton-preview">
+          <div className="skeleton-preview" ref={resultRef}>
             <div className="skeleton-image" />
             <p className="skeleton-text">{getCyclingText()}</p>
             {pollCount === 1 && (
