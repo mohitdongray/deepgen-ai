@@ -112,7 +112,7 @@ export async function startMultipartGeneration(formData) {
 export async function pollUntilComplete(jobId, options = {}) {
   const {
     intervalMs = 2000,
-    maxAttempts = 90,
+    maxAttempts = 60,
     onProgress,
   } = options;
 
@@ -148,7 +148,7 @@ export async function pollUntilComplete(jobId, options = {}) {
     }
   }
 
-  throw new Error("Generation timed out — try again later");
+  throw new Error("Backend did not respond in time. Please try again — the service may still be waking up.");
 }
 
 /** Full JSON flow: start + poll. */

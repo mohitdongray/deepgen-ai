@@ -141,6 +141,9 @@ const UploadPage = () => {
   const [resultImageUrl, setResultImageUrl] = useState(null);
   const [showVideo, setShowVideo] = useState(false);
   const [pollingStatus, setPollingStatus] = useState('');
+  const [pollCount, setPollCount] = useState(0);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [cyclingTextIndex, setCyclingTextIndex] = useState(0);
   const [isSimpleMode, setIsSimpleMode] = useState(false);
   const [simpleModeType, setSimpleModeType] = useState('image');
 
@@ -160,6 +163,34 @@ const UploadPage = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [activeType]);
+
+  // Cycle text every 10 seconds while generating
+  useEffect(() => {
+    if (!isGenerating) return;
+
+    const messages = [
+      'Generating...',
+      'Creating your content...',
+      'Almost there...',
+      'Finalizing...'
+    ];
+
+    const interval = setInterval(() => {
+      setCyclingTextIndex(prev => (prev + 1) % messages.length);
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [isGenerating]);
+
+  const getCyclingText = () => {
+    const messages = [
+      'Generating...',
+      'Creating your content...',
+      'Almost there...',
+      'Finalizing...'
+    ];
+    return messages[cyclingTextIndex];
+  };
 
   // 3. Dropzone Handlers (Generic to handle different fields)
   const onDrop = useCallback((acceptedFiles, fieldName) => {
@@ -225,11 +256,14 @@ const UploadPage = () => {
     setResultVideoUrl(null);
     setResultImageUrl(null);
     setShowVideo(false);
-    setPollingStatus('Initializing...');
+    setImageLoaded(false);
+    setPollCount(prev => prev + 1);
+    setPollingStatus('Starting...');
 
     const onProgress = (job) => {
-      if (job.status === 'processing') setPollingStatus('Processing with AI...');
-      else if (job.status === 'pending') setPollingStatus('Queued...');
+      if (job.status === 'pending') setPollingStatus('Starting...');
+      else if (job.status === 'processing') setPollingStatus('Generating...');
+      else if (job.status === 'completed') setPollingStatus('Finalizing...');
       else setPollingStatus(`Status: ${job.status}`);
     };
 
@@ -379,13 +413,30 @@ const UploadPage = () => {
             )}
           </button>
 
+          {isGenerating && !resultImageUrl && !showVideo && (
+            <div className="skeleton-preview">
+              <div className="skeleton-image" />
+              <p className="skeleton-text">{getCyclingText()}</p>
+              {pollCount === 1 && (
+                <div className="skeleton-text" style={{ fontSize: '12px', marginTop: '8px' }}>
+                  ⏳ Backend waking up – first request may take 30–60s
+                </div>
+              )}
+            </div>
+          )}
+
           {resultImageUrl && simpleModeType === 'image' && (
             <div className="result-video-container" style={{ marginTop: '2rem', textAlign: 'center' }}>
-              <h3>Image Generated!</h3>
+              <h3>{imageLoaded ? "Image Generated Successfully!" : "Finalizing image..."}</h3>
+              {!imageLoaded && (
+                <div className="spinner" style={{ marginTop: '1rem' }} />
+              )}
               <img
                 src={resultImageUrl}
                 alt="AI Generated"
-                style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}
+                style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: imageLoaded ? 'block' : 'none' }}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageLoaded(false)}
               />
             </div>
           )}
@@ -648,15 +699,32 @@ const UploadPage = () => {
           )}
         </button>
 
+        {isGenerating && !resultImageUrl && !showVideo && (
+          <div className="skeleton-preview">
+            <div className="skeleton-image" />
+            <p className="skeleton-text">{getCyclingText()}</p>
+            {pollCount === 1 && (
+              <div className="skeleton-text" style={{ fontSize: '12px', marginTop: '8px' }}>
+                ⏳ Backend waking up – first request may take 30–60s
+              </div>
+            )}
+          </div>
+        )}
+
         {resultImageUrl && !showVideo && (
           <div className="result-video-container" style={{ marginTop: '2rem', textAlign: 'center' }}>
-            <h3>{activeType === 'text-to-image' ? 'Image Generated Successfully!' : 'Generating cinematic video...'}</h3>
+            <h3>{imageLoaded ? (activeType === 'text-to-image' ? 'Image Generated Successfully!' : 'Image Generated Successfully!') : 'Finalizing image...'}</h3>
+            {!imageLoaded && (
+              <div className="spinner" style={{ marginTop: '1rem' }} />
+            )}
             <img
               src={resultImageUrl}
               alt="AI Generated Base"
-              style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}
+              style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: imageLoaded ? 'block' : 'none' }}
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageLoaded(false)}
             />
-            {activeType !== 'text-to-image' && <div style={{ marginTop: '1rem' }} className="spinner"></div>}
+            {activeType !== 'text-to-image' && !imageLoaded && <div style={{ marginTop: '1rem' }} className="spinner"></div>}
           </div>
         )}
 
