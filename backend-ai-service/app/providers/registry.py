@@ -8,8 +8,7 @@ from app.providers.pollinations import PollinationsProvider
 from app.providers.qwen import QwenProvider
 from app.providers.flux import FluxProvider
 from app.providers.tavus import TavusProvider
-# Import MockVideoProvider but we won't use it as fallback
-# from app.providers.mock_video import MockVideoProvider
+# from app.providers.mock_video import MockVideoProvider   # optional fallback
 
 logger = logging.getLogger(__name__)
 
@@ -31,12 +30,19 @@ class ProviderRegistry:
         for provider in providers:
             try:
                 logger.info(f"Trying provider {provider.name}")
-                # Tavus needs 15+ minutes, images are 30-60s
                 provider_timeout = 900.0 if provider.name == "tavus" else 120.0
-                result = await asyncio.wait_for(
-                    provider.generate(prompt, mode=mode, replica_id=replica_id, audio_url=audio_url),
-                    timeout=provider_timeout
-                )
+
+                # Only Tavus accepts replica_id and audio_url
+                if provider.name == "tavus":
+                    result = await asyncio.wait_for(
+                        provider.generate(prompt, mode=mode, replica_id=replica_id, audio_url=audio_url),
+                        timeout=provider_timeout
+                    )
+                else:
+                    result = await asyncio.wait_for(
+                        provider.generate(prompt, mode=mode),
+                        timeout=provider_timeout
+                    )
                 return result, provider.name
             except asyncio.TimeoutError:
                 logger.warning(f"Provider {provider.name} timed out after {provider_timeout}s")
