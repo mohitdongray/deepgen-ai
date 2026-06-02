@@ -41,9 +41,6 @@ async def startup():
     http_client = HttpClient(settings)
     await http_client.start()
     registry = ProviderRegistry(settings, http_client)
-    # Pre-generate mock video so first request is instant
-    # from app.providers.mock_video import _ensure_mock_video_exists
-    # _ensure_mock_video_exists()
 
 @app.on_event("shutdown")
 async def shutdown():
