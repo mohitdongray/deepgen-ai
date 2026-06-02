@@ -112,7 +112,7 @@ export async function startMultipartGeneration(formData) {
 export async function pollUntilComplete(jobId, options = {}) {
   const {
     intervalMs = 2000,
-    maxAttempts = 60,
+    maxAttempts = 450,
     onProgress,
   } = options;
 
@@ -148,7 +148,7 @@ export async function pollUntilComplete(jobId, options = {}) {
     }
   }
 
-  throw new Error("Backend did not respond in time. Please try again — the service may still be waking up.");
+  throw new Error("Backend did not respond in time. Please try again — the request may still be processing and can take several minutes for video generation.");
 }
 
 /** Full JSON flow: start + poll. */

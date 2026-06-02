@@ -5,7 +5,7 @@ import { runJsonGeneration, runMultipartGeneration } from '../../services/genera
 import {
   ArrowLeft, ArrowRight, Upload as UploadIcon,
   Type, Image as ImageIcon, Video, Mic,
-  Globe, User, Film, Sparkles, Check,
+  Globe, User, Users, Film, Sparkles, Check,
   Layers, Zap, Shield, Camera
 } from 'lucide-react';
 import './Upload.css';
@@ -59,7 +59,7 @@ const FEATURE_CONFIG = {
     description: 'Create a professional presentation with a digital avatar.',
     icon: <User size={32} />,
     gradient: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-    required: ['script', 'avatar']
+    required: ['audio']
   },
   // 7. Script to Scene
   'script-to-scene': {
@@ -146,6 +146,9 @@ const UploadPage = () => {
   const [cyclingTextIndex, setCyclingTextIndex] = useState(0);
   const [isSimpleMode, setIsSimpleMode] = useState(false);
   const [simpleModeType, setSimpleModeType] = useState('image');
+  const [selectedReplica, setSelectedReplica] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState('');
+  const [avatarAudio, setAvatarAudio] = useState(null);
   const resultRef = useRef(null);
 
   // Reset form when switching types
@@ -224,6 +227,12 @@ const UploadPage = () => {
     maxFiles: 1
   });
 
+  const avatarAudioDropzone = useDropzone({
+    onDrop: (files) => setAvatarAudio(files[0]),
+    accept: { 'audio/*': ['.mp3', '.wav', '.m4a'] },
+    maxFiles: 1
+  });
+
   // 4. Validation
   const canGenerate = () => {
     if (!activeConfig || !hasConsent) return false;
@@ -234,7 +243,12 @@ const UploadPage = () => {
     if (reqs.includes('image') && !formData.image) return false;
     if (reqs.includes('targetImage') && !formData.targetImage) return false;
     if (reqs.includes('video') && !formData.video) return false;
-    if (reqs.includes('audio') && !formData.audio) return false;
+    if (reqs.includes('audio') && activeType !== 'avatar-video' && !formData.audio) return false;
+    if (activeType === 'avatar-video' && !avatarAudio) return false;
+    if (activeType === 'avatar-video' && !selectedAvatar) return false;
+
+    // Require gender selection for text-to-video
+    if (activeType === 'text-to-video' && !selectedReplica) return false;
 
     return true;
   };
@@ -277,9 +291,15 @@ const UploadPage = () => {
 
     try {
       if (isSimpleMode) {
+        const pollOptions = { onProgress };
+        if (simpleModeType === 'video') {
+          pollOptions.intervalMs = 3000;
+          pollOptions.maxAttempts = 450;
+        }
+
         const result = await runJsonGeneration(
           { prompt: formData.script, mode: simpleModeType },
-          { onProgress }
+          pollOptions
         );
 
         if (simpleModeType === 'image') {
@@ -300,11 +320,38 @@ const UploadPage = () => {
         if (targetMedia) apiFormData.append('target_video', targetMedia);
 
         apiFormData.append('consent_confirmed', 'true');
-        apiFormData.append('description', formData.script || formData.prompt || 'AI generation');
-        const modeMap = { 'text-to-image': 'image', 'style-transfer': 'ai-content-generation' };
-        apiFormData.append('mode', modeMap[activeType] || activeType || 'video');
+        apiFormData.append('description', formData.script || formData.prompt || 'AI avatar presentation');
+        const mode = activeType === 'text-to-image'
+          ? 'image'
+          : activeType === 'style-transfer'
+            ? 'ai-content-generation'
+            : 'video';
+        apiFormData.append('mode', mode);
 
-        const result = await runMultipartGeneration(apiFormData, { onProgress });
+        if (activeType === 'text-to-video' && selectedReplica) {
+          apiFormData.append('replica_id', selectedReplica);
+          console.log('[Upload] Sending replica_id:', selectedReplica);
+        } else if (activeType === 'text-to-video') {
+          console.log('[Upload] Warning: text-to-video but no replica_id selected');
+        }
+
+        if (activeType === 'avatar-video') {
+          if (avatarAudio) {
+            apiFormData.append('avatar_audio', avatarAudio);
+          }
+          if (selectedAvatar) {
+            apiFormData.append('replica_id', selectedAvatar);
+            console.log('[Upload] Sending avatar-video replica_id:', selectedAvatar);
+          }
+        }
+
+        const pollOptions = { onProgress };
+        if (mode === 'video') {
+          pollOptions.intervalMs = 3000;
+          pollOptions.maxAttempts = 450;
+        }
+
+        const result = await runMultipartGeneration(apiFormData, pollOptions);
 
         if (result.image_url) {
           setResultImageUrl(result.image_url);
@@ -427,7 +474,7 @@ const UploadPage = () => {
               <p className="skeleton-text">{getCyclingText()}</p>
               {pollCount === 1 && (
                 <div className="skeleton-text" style={{ fontSize: '12px', marginTop: '8px' }}>
-                  ⏳ Backend waking up – first request may take 30–60s
+                  ⏳ High demand may delay results — please wait a little longer for the generation to finish.
                 </div>
               )}
             </div>
@@ -454,6 +501,9 @@ const UploadPage = () => {
               <video
                 controls
                 autoPlay
+                crossOrigin="anonymous"
+                type="video/mp4"
+                preload="metadata"
                 src={resultVideoUrl}
                 style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}
               />
@@ -543,7 +593,7 @@ const UploadPage = () => {
         )}
 
         {/* 4. Audio Upload */}
-        {(activeConfig.required.includes('audio')) && (
+        {(activeConfig.required.includes('audio') && activeType !== 'avatar-video') && (
           <div className="form-group">
             <label>Upload Audio Sample</label>
             <div {...audioDropzone.getRootProps()} className={`dropzone ${formData.audio ? 'has-file' : ''}`}>
@@ -572,7 +622,8 @@ const UploadPage = () => {
               {activeType === 'text-to-image' ? 'Describe Your Image'
                 : activeType === 'ai-content-generation' ? 'Describe Your Content'
                   : activeType === 'voice-cloning' ? 'Text to Speak'
-                    : 'Your Prompt'}
+                    : activeType === 'text-to-video' ? 'Script to Video'
+                      : 'Your Prompt'}
             </label>
             <div className="prompt-bar">
               <div className="prompt-bar-icon">
@@ -618,8 +669,27 @@ const UploadPage = () => {
 
         {/* === DROPDOWNS & OPTIONS === */}
         <div className="form-row">
-          {/* Voice Selection */}
-          {(['text-to-video', 'avatar-video', 'ai-content-generation'].includes(activeType)) && (
+          {/* Avatar Gender Selection for Text-to-Video */}
+          {activeType === 'text-to-video' && (
+            <div className="form-group">
+              <label>Avatar Gender</label>
+              <div className="select-wrapper select-with-icon">
+                <div className="select-icon"><User size={16} /></div>
+                <select
+                  className="premium-input"
+                  value={selectedReplica}
+                  onChange={(e) => setSelectedReplica(e.target.value)}
+                >
+                  <option value="">Select Gender...</option>
+                  <option value="rf8f3aa4b33e">Male</option>
+                  <option value="r9664272580d">Female</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {/* Voice Selection (for ai-content-generation only) */}
+          {(['ai-content-generation'].includes(activeType)) && (
             <div className="form-group">
               <label>Voice Style</label>
               <div className="select-wrapper">
@@ -656,22 +726,43 @@ const UploadPage = () => {
             </div>
           )}
 
-          {/* Avatar Selection */}
+          {/* Avatar Audio Upload + Gender Selection */}
           {activeType === 'avatar-video' && (
-            <div className="form-group">
-              <label>Avatar Model</label>
-              <div className="select-wrapper">
-                <select
-                  className="premium-input"
-                  value={formData.avatar}
-                  onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
-                >
-                  <option value="business-professional">Business Professional</option>
-                  <option value="casual-anchor">Casual Anchor</option>
-                  <option value="tech-expert">Tech Expert</option>
-                </select>
+            <>
+              <div className="form-group">
+                <label>Upload Audio (MP3 / WAV) – lip-sync will match this audio</label>
+                <div {...avatarAudioDropzone.getRootProps()} className={`dropzone ${avatarAudio ? 'has-file' : ''}`}>
+                  <input {...avatarAudioDropzone.getInputProps()} />
+                  {avatarAudio ? (
+                    <div className="file-preview">
+                      <Check className="success-icon" />
+                      <span>{avatarAudio.name}</span>
+                    </div>
+                  ) : (
+                    <div className="dropzone-placeholder">
+                      <Mic size={32} />
+                      <p>Drag & drop an audio file (up to 50 MB)</p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+
+              <div className="form-group">
+                <label>Avatar Gender</label>
+                <div className="select-wrapper select-with-icon">
+                  <div className="select-icon"><User size={16} /></div>
+                  <select
+                    className="premium-input"
+                    value={selectedAvatar}
+                    onChange={(e) => setSelectedAvatar(e.target.value)}
+                  >
+                    <option value="">Select Gender...</option>
+                    <option value="rf8f3aa4b33e">Male</option>
+                    <option value="r9664272580d">Female</option>
+                  </select>
+                </div>
+              </div>
+            </>
           )}
         </div>
 
@@ -713,7 +804,7 @@ const UploadPage = () => {
             <p className="skeleton-text">{getCyclingText()}</p>
             {pollCount === 1 && (
               <div className="skeleton-text" style={{ fontSize: '12px', marginTop: '8px' }}>
-                ⏳ Backend waking up – first request may take 30–60s
+                ⏳ High demand may delay results — please wait a little longer for the generation to finish.
               </div>
             )}
           </div>
@@ -742,6 +833,9 @@ const UploadPage = () => {
               id="resultVideo"
               controls
               autoPlay
+              crossOrigin="anonymous"
+              type="video/mp4"
+              preload="metadata"
               src={resultVideoUrl}
               style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}
             />
