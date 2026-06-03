@@ -1,42 +1,18 @@
-# Render Blueprint — DeepGen AI
-# Deploy as two Web Services + static site (Vercel recommended for frontend)
-
 services:
   - type: web
-    name: deepgen-ai-service
-    runtime: python
-    rootDir: backend-ai-service
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /health
+    name: deepgen-ai-service  # ⬅️ Match this to your service name on Render
+    runtime: image
+    repo: https://github.com/mohitdongray/deepgen-ai
+    branch: main
+    dockerfilePath: ./backend-ai-service/Dockerfile
+    build:
+      dockerBuildCommand: docker build -t deepgen-ai-service -f ./backend-ai-service/Dockerfile .
     envVars:
-      - key: PYTHON_VERSION
-        value: "3.11.8"
-      - key: QWEN_API_KEY
-        sync: false
-      - key: FLUX_API_KEY
-        sync: false
       - key: TAVUS_API_KEY
         sync: false
       - key: TAVUS_REPLICA_ID
         sync: false
-      - key: CORS_ORIGINS
-        value: "*"
-
-  - type: web
-    name: deepgen-gateway
-    runtime: node
-    rootDir: backend-gateway
-    buildCommand: npm install
-    startCommand: npm start
+      - key: PUBLIC_BASE_URL
+        value: https://deepgen-ai.onrender.com  # ⬅️ Replace with your actual AI service URL
+    plan: free
     healthCheckPath: /health
-    envVars:
-      - key: PORT
-        value: "5000"
-      - key: AI_SERVICE_URL
-        fromService:
-          name: deepgen-ai-service
-          type: web
-          property: host
-      - key: FRONTEND_URL
-        sync: false
