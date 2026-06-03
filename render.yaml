@@ -1,9 +1,7 @@
 services:
   - type: web
-    name: deepgen-ai-service    # 👈 Must match your existing service name on Render
-    runtime: docker             # 👈 Correct type for building from a Dockerfile
-    repo: https://github.com/mohitdongray/deepgen-ai
-    branch: main
+    name: deepgen-ai-service
+    runtime: docker
     rootDir: backend-ai-service
     dockerfilePath: Dockerfile
     plan: free
