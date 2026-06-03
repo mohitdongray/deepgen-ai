@@ -52,6 +52,7 @@ const storage = multer.memoryStorage();
 export const uploadMiddleware = multer({ storage }).fields([
   { name: "source_image", maxCount: 1 },
   { name: "target_video", maxCount: 1 },
+  { name: "avatar_audio", maxCount: 1 },  // required for avatar-video / Tavus audio-to-video
 ]);
 
 export async function generateContent(req, res) {
@@ -67,6 +68,16 @@ export async function generateContent(req, res) {
     form.append("mode", normalizedMode);
     form.append("consent_confirmed", req.body.consent_confirmed || "true");
 
+    // Forward replica_id and audio_url for avatar-video / Tavus requests
+    if (req.body.replica_id) {
+      form.append("replica_id", req.body.replica_id);
+      console.log("[Gateway] Forwarding replica_id:", req.body.replica_id);
+    }
+    if (req.body.audio_url) {
+      form.append("audio_url", req.body.audio_url);
+      console.log("[Gateway] Forwarding audio_url:", req.body.audio_url);
+    }
+
     if (req.files?.source_image?.[0]) {
       const f = req.files.source_image[0];
       form.append("source_image", f.buffer, {
@@ -81,6 +92,16 @@ export async function generateContent(req, res) {
         filename: f.originalname || "video.mp4",
         contentType: f.mimetype,
       });
+    }
+
+    // avatar-video / Tavus: forward the audio file uploaded by the frontend
+    if (req.files?.avatar_audio?.[0]) {
+      const f = req.files.avatar_audio[0];
+      form.append("avatar_audio", f.buffer, {
+        filename: f.originalname || "audio.wav",
+        contentType: f.mimetype,
+      });
+      console.log("[Gateway] Forwarding avatar_audio:", f.originalname, f.mimetype);
     }
 
     const response = await axios.post(`${AI_SERVICE_URL}/generate`, form, {
@@ -122,7 +143,14 @@ export async function generateJson(req, res) {
       text: body.text,
       image_url: body.image_url,
       job_id: body.job_id,
+      // Forward Tavus-specific fields
+      replica_id: body.replica_id || undefined,
+      audio_url: body.audio_url || undefined,
     };
+
+    if (payload.replica_id) {
+      console.log("[Gateway] Forwarding replica_id:", payload.replica_id);
+    }
 
     const response = await axios.post(`${AI_SERVICE_URL}/generate-json`, payload, {
       headers: { "Content-Type": "application/json" },
