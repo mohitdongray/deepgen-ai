@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
-import { runJsonGeneration, runMultipartGeneration } from '../../services/generationService';
+import { runJsonGeneration, runMultipartGeneration, resolveMediaUrl } from '../../services/generationService';
 import {
   ArrowLeft, ArrowRight, Upload as UploadIcon,
   Type, Image as ImageIcon, Video, Mic,
@@ -314,13 +314,11 @@ const UploadPage = () => {
         }
       } else {
         const apiFormData = new FormData();
-        if (formData.image) apiFormData.append('source_image', formData.image);
-
-        const targetMedia = formData.video || formData.targetImage;
-        if (targetMedia) apiFormData.append('target_video', targetMedia);
-
+        
+        // 1. APPEND ALL TEXT FIELDS FIRST (Crucial for reliable Multer body parsing)
         apiFormData.append('consent_confirmed', 'true');
         apiFormData.append('description', formData.script || formData.prompt || 'AI avatar presentation');
+        
         const mode = activeType === 'text-to-image'
           ? 'image'
           : activeType === 'style-transfer'
@@ -335,14 +333,19 @@ const UploadPage = () => {
           console.log('[Upload] Warning: text-to-video but no replica_id selected');
         }
 
-        if (activeType === 'avatar-video') {
-          if (avatarAudio) {
-            apiFormData.append('avatar_audio', avatarAudio);
-          }
-          if (selectedAvatar) {
-            apiFormData.append('replica_id', selectedAvatar);
-            console.log('[Upload] Sending avatar-video replica_id:', selectedAvatar);
-          }
+        if (activeType === 'avatar-video' && selectedAvatar) {
+          apiFormData.append('replica_id', selectedAvatar);
+          console.log('[Upload] Sending avatar-video replica_id:', selectedAvatar);
+        }
+
+        // 2. APPEND FILE STREAMS LAST
+        if (formData.image) apiFormData.append('source_image', formData.image);
+
+        const targetMedia = formData.video || formData.targetImage;
+        if (targetMedia) apiFormData.append('target_video', targetMedia);
+
+        if (activeType === 'avatar-video' && avatarAudio) {
+          apiFormData.append('avatar_audio', avatarAudio);
         }
 
         const pollOptions = { onProgress };
@@ -487,11 +490,11 @@ const UploadPage = () => {
                 <div className="spinner" style={{ marginTop: '1rem' }} />
               )}
               <img
-                src={resultImageUrl}
+                src={resolveMediaUrl(resultImageUrl)}
                 alt="AI Generated"
-                style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: 'block' }}
-                onLoad={() => { console.log('[Upload] Image loaded:', resultImageUrl); setImageLoaded(true); }}
-                onError={(e) => { console.error('[Upload] Image failed to load:', resultImageUrl, e); setImageLoaded(false); }}
+                style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: imageLoaded ? 'block' : 'none' }}
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageLoaded(false)}
               />
             </div>
           )}
@@ -812,17 +815,18 @@ const UploadPage = () => {
 
         {resultImageUrl && !showVideo && (
           <div className="result-video-container" style={{ marginTop: '2rem', textAlign: 'center' }}>
-            <h3>{imageLoaded ? 'Image Generated Successfully!' : 'Finalizing image...'}</h3>
+            <h3>{imageLoaded ? (activeType === 'text-to-image' ? 'Image Generated Successfully!' : 'Image Generated Successfully!') : 'Finalizing image...'}</h3>
             {!imageLoaded && (
               <div className="spinner" style={{ marginTop: '1rem' }} />
             )}
             <img
-              src={resultImageUrl}
+              src={resolveMediaUrl(resultImageUrl)}
               alt="AI Generated Base"
-              style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: 'block' }}
-              onLoad={() => { console.log('[Upload] Image loaded:', resultImageUrl); setImageLoaded(true); }}
-              onError={(e) => { console.error('[Upload] Image failed to load:', resultImageUrl, e); setImageLoaded(false); }}
+              style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: imageLoaded ? 'block' : 'none' }}
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageLoaded(false)}
             />
+            {activeType !== 'text-to-image' && !imageLoaded && <div style={{ marginTop: '1rem' }} className="spinner"></div>}
           </div>
         )}
 
