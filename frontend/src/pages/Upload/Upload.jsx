@@ -489,9 +489,9 @@ const UploadPage = () => {
               <img
                 src={resultImageUrl}
                 alt="AI Generated"
-                style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: imageLoaded ? 'block' : 'none' }}
-                onLoad={() => setImageLoaded(true)}
-                onError={() => setImageLoaded(false)}
+                style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: 'block' }}
+                onLoad={() => { console.log('[Upload] Image loaded:', resultImageUrl); setImageLoaded(true); }}
+                onError={(e) => { console.error('[Upload] Image failed to load:', resultImageUrl, e); setImageLoaded(false); }}
               />
             </div>
           )}
@@ -812,18 +812,17 @@ const UploadPage = () => {
 
         {resultImageUrl && !showVideo && (
           <div className="result-video-container" style={{ marginTop: '2rem', textAlign: 'center' }}>
-            <h3>{imageLoaded ? (activeType === 'text-to-image' ? 'Image Generated Successfully!' : 'Image Generated Successfully!') : 'Finalizing image...'}</h3>
+            <h3>{imageLoaded ? 'Image Generated Successfully!' : 'Finalizing image...'}</h3>
             {!imageLoaded && (
               <div className="spinner" style={{ marginTop: '1rem' }} />
             )}
             <img
               src={resultImageUrl}
               alt="AI Generated Base"
-              style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: imageLoaded ? 'block' : 'none' }}
-              onLoad={() => setImageLoaded(true)}
-              onError={() => setImageLoaded(false)}
+              style={{ maxWidth: '100%', borderRadius: '12px', marginTop: '1rem', boxShadow: '0 10px 25px rgba(0,0,0,0.5)', display: 'block' }}
+              onLoad={() => { console.log('[Upload] Image loaded:', resultImageUrl); setImageLoaded(true); }}
+              onError={(e) => { console.error('[Upload] Image failed to load:', resultImageUrl, e); setImageLoaded(false); }}
             />
-            {activeType !== 'text-to-image' && !imageLoaded && <div style={{ marginTop: '1rem' }} className="spinner"></div>}
           </div>
         )}
 
