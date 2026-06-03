@@ -25,7 +25,14 @@ class ProviderRegistry:
         else:
             raise ValueError(f"Unsupported mode: {mode}")
 
-        logger.info(f"[REGISTRY] generate called with mode={mode}, replica_id={replica_id}, audio_url={audio_url}")
+        logger.info(f"[REGISTRY] generate called with mode={mode}, replica_id={replica_id!r}, audio_url={audio_url!r}")
+
+        if mode == "video" and not replica_id:
+            # Use the configured default from settings, but warn loudly
+            logger.warning(
+                "[REGISTRY] replica_id not provided by caller — "
+                f"falling back to TAVUS_REPLICA_ID from settings: {self.settings.tavus_replica_id!r}"
+            )
 
         for provider in providers:
             try:
