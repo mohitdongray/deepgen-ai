@@ -1,18 +1,13 @@
 services:
   - type: web
-    name: deepgen-ai-service  # ⬅️ Match this to your service name on Render
+    name: deepgen-ai-service
     runtime: image
-    repo: https://github.com/mohitdongray/deepgen-ai
-    branch: main
     dockerfilePath: ./backend-ai-service/Dockerfile
-    build:
-      dockerBuildCommand: docker build -t deepgen-ai-service -f ./backend-ai-service/Dockerfile .
     envVars:
       - key: TAVUS_API_KEY
         sync: false
       - key: TAVUS_REPLICA_ID
         sync: false
       - key: PUBLIC_BASE_URL
-        value: https://deepgen-ai.onrender.com  # ⬅️ Replace with your actual AI service URL
-    plan: free
+        value: https://deepgen-ai.onrender.com
     healthCheckPath: /health
